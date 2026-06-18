@@ -19,9 +19,17 @@ const Login = () => {
       await login(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(
-        err.response?.data?.detail || 'Failed to sign in. Please verify your credentials.'
-      );
+      console.error('Login submit error:', err);
+      const detail = err.response?.data?.detail;
+      if (typeof detail === 'string') {
+        setError(detail);
+      } else if (Array.isArray(detail)) {
+        setError(detail[0]?.msg || 'Validation error');
+      } else if (detail && typeof detail === 'object') {
+        setError(detail.message || JSON.stringify(detail));
+      } else {
+        setError('Failed to sign in. Please verify your credentials.');
+      }
     } finally {
       setLoading(false);
     }

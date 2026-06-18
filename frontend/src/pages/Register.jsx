@@ -17,6 +17,15 @@ const Register = () => {
   const { register, sendOtp } = useAuth();
   const navigate = useNavigate();
 
+  const getErrorMessage = (err, fallback) => {
+    console.error(err);
+    const detail = err.response?.data?.detail;
+    if (typeof detail === 'string') return detail;
+    if (Array.isArray(detail)) return detail[0]?.msg || 'Validation error';
+    if (detail && typeof detail === 'object') return detail.message || JSON.stringify(detail);
+    return fallback;
+  };
+
   // Handle countdown for resending OTP
   useEffect(() => {
     let timer = null;
@@ -42,9 +51,7 @@ const Register = () => {
       setResendCooldown(60);
       setInfoMessage(response?.message || `We've sent a verification code to ${email}`);
     } catch (err) {
-      setError(
-        err.response?.data?.detail || 'Failed to send verification code. Please check your email address or try again.'
-      );
+      setError(getErrorMessage(err, 'Failed to send verification code. Please check your email address or try again.'));
     } finally {
       setLoading(false);
     }
@@ -60,9 +67,7 @@ const Register = () => {
       await register(email, password, fullName, otp);
       navigate('/dashboard');
     } catch (err) {
-      setError(
-        err.response?.data?.detail || 'Failed to verify OTP or register. Please check the code and try again.'
-      );
+      setError(getErrorMessage(err, 'Failed to verify OTP or register. Please check the code and try again.'));
     } finally {
       setLoading(false);
     }
@@ -79,9 +84,7 @@ const Register = () => {
       setResendCooldown(60);
       setInfoMessage(response?.message || 'Verification code resent successfully!');
     } catch (err) {
-      setError(
-        err.response?.data?.detail || 'Failed to resend verification code. Please try again.'
-      );
+      setError(getErrorMessage(err, 'Failed to resend verification code. Please try again.'));
     } finally {
       setLoading(false);
     }
