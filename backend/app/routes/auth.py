@@ -64,21 +64,20 @@ def send_otp(otp_in: OTPRequest, db: Session = Depends(get_db)):
     db.commit()
 
     # 6. Send the OTP
-    smtp_failed = False
-    error_msg = ""
+    email_failed = False
     try:
         send_otp_email(email, otp)
     except Exception as e:
-        smtp_failed = True
-        error_msg = str(e)
-        print(f"Warning: SMTP email delivery failed: {error_msg}")
+        email_failed = True
+        print(f"Warning: Email delivery failed: {str(e)}")
 
-    if smtp_failed:
+    if email_failed:
         return {
-            "message": f"Verification code generated (SMTP delivery failed: {error_msg}). For testing, your verification code is: {otp}"
+            "message": f"Verification code generated (Demo Mode: {otp})"
         }
 
     return {"message": f"Verification code sent successfully to {email}."}
+
 
 
 
