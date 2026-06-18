@@ -37,10 +37,10 @@ const Register = () => {
     setInfoMessage('');
     setLoading(true);
     try {
-      await sendOtp(email);
+      const response = await sendOtp(email);
       setStep(2);
       setResendCooldown(60);
-      setInfoMessage(`We've sent a verification code to ${email}`);
+      setInfoMessage(response?.message || `We've sent a verification code to ${email}`);
     } catch (err) {
       setError(
         err.response?.data?.detail || 'Failed to send verification code. Please check your email address or try again.'
@@ -75,9 +75,9 @@ const Register = () => {
     setInfoMessage('');
     setLoading(true);
     try {
-      await sendOtp(email);
+      const response = await sendOtp(email);
       setResendCooldown(60);
-      setInfoMessage('Verification code resent successfully!');
+      setInfoMessage(response?.message || 'Verification code resent successfully!');
     } catch (err) {
       setError(
         err.response?.data?.detail || 'Failed to resend verification code. Please try again.'
