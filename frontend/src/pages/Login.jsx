@@ -28,36 +28,36 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-12 relative overflow-hidden">
       {/* Background ambient lights */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/3 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500/3 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="w-full max-w-md glass-panel p-8 rounded-2xl relative z-10 animate-scale-in">
+      <div className="w-full max-w-md glass-panel p-8 rounded-2xl relative z-10 animate-scale-in border border-slate-200">
         <div className="flex flex-col items-center mb-8">
-          <div className="w-12 h-12 bg-sky-500/10 border border-sky-500/30 rounded-xl flex items-center justify-center mb-3 text-sky-400">
-            <Lightbulb size={28} className="animate-pulse-glow" />
+          <div className="w-12 h-12 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-center mb-3 text-blue-600">
+            <Lightbulb size={28} />
           </div>
-          <h2 className="text-2xl font-bold tracking-tight text-white text-center">
+          <h2 className="text-2xl font-bold tracking-tight text-slate-900 text-center">
             Startup Idea Validation
           </h2>
-          <p className="text-sm text-slate-400 mt-1 text-center">
+          <p className="text-sm text-slate-500 mt-1 text-center font-medium">
             Log in to evaluate and design your business models
           </p>
         </div>
 
         {error && (
-          <div className="mb-6 bg-red-500/10 border border-red-500/20 text-red-200 p-4 rounded-xl flex items-start gap-3 text-sm animate-fade-in">
-            <AlertCircle size={18} className="text-red-400 shrink-0 mt-0.5" />
+          <div className="mb-6 bg-red-50 border border-red-100 text-red-700 p-4 rounded-xl flex items-start gap-3 text-sm animate-fade-in">
+            <AlertCircle size={18} className="text-red-600 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="flex flex-col">
-            <label className="text-sm font-medium text-slate-300 mb-2">Email Address</label>
+            <label className="text-sm font-semibold text-slate-700 mb-2">Email Address</label>
             <div className="relative">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <input
                 type="email"
                 required
@@ -71,10 +71,10 @@ const Login = () => {
 
           <div className="flex flex-col">
             <div className="flex justify-between items-center mb-2">
-              <label className="text-sm font-medium text-slate-300">Password</label>
+              <label className="text-sm font-semibold text-slate-700">Password</label>
             </div>
             <div className="relative">
-              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
               <input
                 type="password"
                 required
@@ -89,16 +89,16 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-sky-500/20 disabled:opacity-50 disabled:pointer-events-none mt-8"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-blue-500/10 disabled:opacity-50 disabled:pointer-events-none mt-8 cursor-pointer text-sm"
           >
             {loading ? 'Signing In...' : 'Sign In'}
             {!loading && <ArrowRight size={18} />}
           </button>
         </form>
 
-        <p className="mt-8 text-center text-sm text-slate-400">
+        <p className="mt-8 text-center text-sm text-slate-500 font-medium">
           Don't have an account?{' '}
-          <Link to="/register" className="text-sky-400 hover:underline hover:text-sky-300 font-medium">
+          <Link to="/register" className="text-blue-600 hover:underline hover:text-blue-700 font-bold">
             Create an account
           </Link>
         </p>

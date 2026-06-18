@@ -10,6 +10,14 @@ import {
   Briefcase, HeartHandshake, Loader2, Check, X, ChevronLeft, ChevronRight, Award
 } from 'lucide-react';
 
+const formatUrl = (url) => {
+  if (!url) return '';
+  if (/^https?:\/\//i.test(url)) {
+    return url;
+  }
+  return `https://${url}`;
+};
+
 const IdeaDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -69,54 +77,54 @@ const IdeaDetail = () => {
     return (
       <div className="space-y-6 pb-12 animate-fade-in">
         {/* Skeleton Header */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-slate-900/30 p-6 rounded-2xl border border-slate-800/40 backdrop-blur-md">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
           <div className="space-y-2.5 w-full max-w-md">
-            <div className="w-24 h-4 bg-slate-850 rounded animate-pulse"></div>
-            <div className="w-48 h-8 bg-slate-800 rounded animate-pulse"></div>
+            <div className="w-24 h-4 bg-slate-100 rounded animate-pulse"></div>
+            <div className="w-48 h-8 bg-slate-200 rounded animate-pulse"></div>
             <div className="flex gap-2">
-              <div className="w-16 h-5 bg-slate-850 rounded-full animate-pulse"></div>
-              <div className="w-20 h-5 bg-slate-850 rounded-full animate-pulse"></div>
+              <div className="w-16 h-5 bg-slate-100 rounded-full animate-pulse"></div>
+              <div className="w-20 h-5 bg-slate-100 rounded-full animate-pulse"></div>
             </div>
           </div>
           <div className="flex gap-3 w-full lg:w-auto">
-            <div className="w-36 h-10 bg-slate-800 rounded-xl animate-pulse"></div>
-            <div className="w-36 h-10 bg-slate-800 rounded-xl animate-pulse"></div>
+            <div className="w-36 h-10 bg-slate-200 rounded-xl animate-pulse"></div>
+            <div className="w-36 h-10 bg-slate-200 rounded-xl animate-pulse"></div>
           </div>
         </div>
 
         {/* Skeleton Tabs */}
-        <div className="flex gap-2 border-b border-slate-800/60 pb-1 overflow-x-auto">
+        <div className="flex gap-2 border-b border-slate-200 pb-1 overflow-x-auto">
           {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="w-28 h-10 bg-slate-850 rounded-lg shrink-0 animate-pulse"></div>
+            <div key={i} className="w-28 h-10 bg-slate-100 rounded-lg shrink-0 animate-pulse"></div>
           ))}
         </div>
 
         {/* Skeleton Dashboard Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
           <div className="lg:col-span-7 space-y-6">
-            <div className="glass-panel p-6 rounded-2xl h-80 flex flex-col justify-between">
-              <div className="w-36 h-5 bg-slate-850 rounded animate-pulse"></div>
-              <div className="w-48 h-48 rounded-full bg-slate-800/40 mx-auto flex items-center justify-center animate-pulse">
-                <Loader2 className="animate-spin text-sky-500/40" size={32} />
+            <div className="glass-panel p-6 rounded-2xl h-80 flex flex-col justify-between border border-slate-200">
+              <div className="w-36 h-5 bg-slate-100 rounded animate-pulse"></div>
+              <div className="w-48 h-48 rounded-full bg-slate-100 mx-auto flex items-center justify-center animate-pulse">
+                <Loader2 className="animate-spin text-blue-650/40" size={32} />
               </div>
-              <div className="w-full h-4 bg-slate-850 rounded animate-pulse"></div>
+              <div className="w-full h-4 bg-slate-100 rounded animate-pulse"></div>
             </div>
           </div>
           <div className="lg:col-span-5 space-y-6">
-            <div className="glass-panel p-6 rounded-2xl flex items-center gap-6">
-              <div className="w-20 h-20 rounded-full bg-slate-800 animate-pulse shrink-0"></div>
+            <div className="glass-panel p-6 rounded-2xl flex items-center gap-6 border border-slate-200">
+              <div className="w-20 h-20 rounded-full bg-slate-100 animate-pulse shrink-0"></div>
               <div className="space-y-2 w-full">
-                <div className="w-32 h-5 bg-slate-850 rounded animate-pulse"></div>
-                <div className="w-full h-4 bg-slate-850 rounded animate-pulse"></div>
-                <div className="w-3/4 h-4 bg-slate-850 rounded animate-pulse"></div>
+                <div className="w-32 h-5 bg-slate-100 rounded animate-pulse"></div>
+                <div className="w-full h-4 bg-slate-100 rounded animate-pulse"></div>
+                <div className="w-3/4 h-4 bg-slate-100 rounded animate-pulse"></div>
               </div>
             </div>
-            <div className="glass-panel p-6 rounded-2xl space-y-4">
-              <div className="w-28 h-5 bg-slate-850 rounded animate-pulse"></div>
+            <div className="glass-panel p-6 rounded-2xl space-y-4 border border-slate-200">
+              <div className="w-28 h-5 bg-slate-100 rounded animate-pulse"></div>
               <div className="space-y-2">
-                <div className="w-full h-4 bg-slate-850 rounded animate-pulse"></div>
-                <div className="w-full h-4 bg-slate-850 rounded animate-pulse"></div>
-                <div className="w-5/6 h-4 bg-slate-850 rounded animate-pulse"></div>
+                <div className="w-full h-4 bg-slate-100 rounded animate-pulse"></div>
+                <div className="w-full h-4 bg-slate-100 rounded animate-pulse"></div>
+                <div className="w-5/6 h-4 bg-slate-100 rounded animate-pulse"></div>
               </div>
             </div>
           </div>
@@ -137,11 +145,11 @@ const IdeaDetail = () => {
   ];
 
   const barChartData = [
-    { name: 'Viability', score: scores?.viability_score || 0, fill: '#0ea5e9' },
-    { name: 'Market', score: scores?.market_opportunity_score || 0, fill: '#6366f1' },
-    { name: 'Competition', score: scores?.competition_score || 0, fill: '#14b8a6' },
-    { name: 'Revenue', score: scores?.revenue_potential_score || 0, fill: '#f59e0b' },
-    { name: 'Risk Safety', score: scores?.risk_assessment_score || 0, fill: '#f43f5e' },
+    { name: 'Viability', score: scores?.viability_score || 0, fill: '#2563EB' },
+    { name: 'Market', score: scores?.market_opportunity_score || 0, fill: '#0EA5E9' },
+    { name: 'Competition', score: scores?.competition_score || 0, fill: '#10B981' },
+    { name: 'Revenue', score: scores?.revenue_potential_score || 0, fill: '#F59E0B' },
+    { name: 'Risk Safety', score: scores?.risk_assessment_score || 0, fill: '#EF4444' },
   ];
 
   const tabs = [
@@ -157,18 +165,18 @@ const IdeaDetail = () => {
   return (
     <div className="space-y-6 animate-fade-in pb-12">
       {/* Detail Header / Control bar */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-slate-900/30 p-6 rounded-2xl border border-slate-800/40 backdrop-blur-md">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
         <div className="space-y-1">
           <button
             onClick={() => navigate('/dashboard')}
-            className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors mb-2 font-medium"
+            className="flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-800 transition-colors mb-2 font-semibold cursor-pointer"
           >
             <ArrowLeft size={14} />
             Back to Dashboard
           </button>
-          <h2 className="text-2xl font-bold text-white tracking-wide">{idea.name}</h2>
-          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-400 mt-1">
-            <span className="bg-sky-500/10 text-sky-400 border border-sky-500/20 px-2.5 py-0.5 rounded-full font-semibold">
+          <h2 className="text-2xl font-bold text-slate-900 tracking-wide">{idea.name}</h2>
+          <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 mt-1">
+            <span className="bg-blue-50 text-blue-600 border border-blue-100 px-2.5 py-0.5 rounded-full font-bold">
               {idea.industry}
             </span>
             <span>•</span>
@@ -182,7 +190,7 @@ const IdeaDetail = () => {
           <button
             onClick={handleRecalculate}
             disabled={recalculating}
-            className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700/60 font-semibold py-2.5 px-4 rounded-xl text-sm flex items-center gap-2 transition-all disabled:opacity-50 disabled:pointer-events-none"
+            className="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-semibold py-2.5 px-4 rounded-xl text-sm flex items-center gap-2 transition-all disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
           >
             {recalculating ? (
               <>
@@ -200,7 +208,7 @@ const IdeaDetail = () => {
           <button
             onClick={handleDownloadPdf}
             disabled={downloading}
-            className="bg-sky-500 hover:bg-sky-400 text-white font-semibold py-2.5 px-4 rounded-xl text-sm flex items-center gap-2 transition-all shadow-md shadow-sky-500/10 disabled:opacity-50 disabled:pointer-events-none"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-xl text-sm flex items-center gap-2 transition-all shadow-md shadow-blue-500/10 disabled:opacity-50 disabled:pointer-events-none cursor-pointer"
           >
             {downloading ? (
               <>
@@ -218,7 +226,7 @@ const IdeaDetail = () => {
       </div>
 
       {/* Tabs list */}
-      <div className="flex overflow-x-auto pb-1 border-b border-slate-800/60 gap-1 scrollbar-hide">
+      <div className="flex overflow-x-auto pb-1 border-b border-slate-200 gap-1 scrollbar-hide">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -226,13 +234,13 @@ const IdeaDetail = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-5 py-3.5 border-b-2 text-sm font-semibold whitespace-nowrap transition-all duration-300 ${
+              className={`flex items-center gap-2 px-4 py-3 border-b-2 text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
                 isActive
-                  ? 'border-sky-500 text-white bg-sky-500/5'
-                  : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-900/20'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-slate-500 hover:text-slate-800'
               }`}
             >
-              <Icon size={16} className={isActive ? 'text-sky-400' : 'text-slate-400'} />
+              <Icon size={16} className={isActive ? 'text-blue-600' : 'text-slate-400'} />
               {tab.name}
             </button>
           );
@@ -246,22 +254,22 @@ const IdeaDetail = () => {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             {/* Left: Scores & charts */}
             <div className="lg:col-span-7 space-y-6">
-              <div className="glass-panel p-6 rounded-2xl">
-                <h3 className="text-base font-bold text-white mb-6 uppercase tracking-wider">Viability Scores Radar</h3>
+              <div className="glass-panel p-6 rounded-2xl border border-slate-200">
+                <h3 className="text-base font-bold text-slate-800 mb-6 uppercase tracking-wider">Viability Scores Radar</h3>
                 
                 {scores ? (
                   <div className="h-80 w-full flex items-center justify-center">
                     <ResponsiveContainer width="100%" height="100%">
                       <RadarChart cx="50%" cy="50%" outerRadius="75%" data={chartData}>
-                        <PolarGrid stroke="#334155" />
-                        <PolarAngleAxis dataKey="subject" stroke="#94a3b8" fontSize={11} />
-                        <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="#475569" />
+                        <PolarGrid stroke="#E2E8F0" />
+                        <PolarAngleAxis dataKey="subject" stroke="#64748B" fontSize={11} />
+                        <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="#94A3B8" />
                         <Radar
                           name="Evaluation"
                           dataKey="value"
-                          stroke="#0ea5e9"
-                          fill="#0ea5e9"
-                          fillOpacity={0.25}
+                          stroke="#2563EB"
+                          fill="#2563EB"
+                          fillOpacity={0.15}
                           isAnimationActive={true}
                           animationDuration={800}
                           animationEasing="ease-out"
@@ -270,7 +278,7 @@ const IdeaDetail = () => {
                     </ResponsiveContainer>
                   </div>
                 ) : (
-                  <div className="py-12 text-center text-slate-500 text-sm">
+                  <div className="py-12 text-center text-slate-400 text-sm font-medium">
                     AI Viability Score analysis not run. Trigger evaluation above.
                   </div>
                 )}
@@ -278,16 +286,16 @@ const IdeaDetail = () => {
 
               {/* Bar chart fallback / secondary visual */}
               {scores && (
-                <div className="glass-panel p-6 rounded-2xl">
-                  <h3 className="text-base font-bold text-white mb-6 uppercase tracking-wider">Metric Breakdown</h3>
+                <div className="glass-panel p-6 rounded-2xl border border-slate-200">
+                  <h3 className="text-base font-bold text-slate-800 mb-6 uppercase tracking-wider">Metric Breakdown</h3>
                   <div className="h-64 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={barChartData} layout="vertical">
-                        <XAxis type="number" domain={[0, 100]} stroke="#475569" fontSize={11} />
-                        <YAxis dataKey="name" type="category" stroke="#94a3b8" fontSize={11} width={90} />
+                        <XAxis type="number" domain={[0, 100]} stroke="#94A3B8" fontSize={11} />
+                        <YAxis dataKey="name" type="category" stroke="#64748B" fontSize={11} width={90} />
                         <Tooltip
-                          contentStyle={{ background: '#0f172a', borderColor: '#334155', borderRadius: '8px' }}
-                          labelStyle={{ color: '#fff' }}
+                          contentStyle={{ background: '#ffffff', borderColor: '#E2E8F0', borderRadius: '8px' }}
+                          labelStyle={{ color: '#0F172A', fontWeight: 'bold' }}
                         />
                         <Bar 
                           dataKey="score" 
@@ -307,19 +315,19 @@ const IdeaDetail = () => {
             <div className="lg:col-span-5 space-y-6">
               {/* Overall Score Circle Card */}
               {scores && (
-                <div className="glass-panel p-6 rounded-2xl flex items-center gap-6 bg-gradient-to-br from-slate-900 to-brand-950">
-                  <div className={`w-20 h-20 rounded-full border-4 flex items-center justify-center text-2xl font-extrabold shrink-0 shadow-lg ${
+                <div className="glass-panel p-6 rounded-2xl flex items-center gap-6 bg-slate-50 border border-slate-200">
+                  <div className={`w-20 h-20 rounded-full border-4 flex items-center justify-center text-2xl font-extrabold shrink-0 shadow-sm ${
                     scores.viability_score >= 80
-                      ? 'border-emerald-500 text-emerald-400 shadow-emerald-500/10'
+                      ? 'border-emerald-500 text-emerald-700 bg-emerald-50'
                       : scores.viability_score >= 60
-                      ? 'border-yellow-500 text-yellow-400 shadow-yellow-500/10'
-                      : 'border-rose-500 text-rose-400 shadow-rose-500/10'
+                      ? 'border-amber-500 text-amber-700 bg-amber-50'
+                      : 'border-rose-500 text-rose-700 bg-rose-50'
                   }`}>
                     {scores.viability_score}%
                   </div>
                   <div>
-                    <h4 className="text-lg font-bold text-white">Overall Viability Score</h4>
-                    <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                    <h4 className="text-lg font-bold text-slate-850">Overall Viability Score</h4>
+                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                       This score reflects cumulative ratings for demand severity, market scope, revenue dynamics, and barrier execution.
                     </p>
                   </div>
@@ -327,28 +335,28 @@ const IdeaDetail = () => {
               )}
 
               {/* Executive Summary */}
-              <div className="glass-panel p-6 rounded-2xl">
-                <h3 className="text-base font-bold text-white mb-4 uppercase tracking-wider">Executive Verdict</h3>
+              <div className="glass-panel p-6 rounded-2xl border border-slate-200">
+                <h3 className="text-base font-bold text-slate-800 mb-4 uppercase tracking-wider">Executive Verdict</h3>
                 {scores ? (
-                  <p className="text-sm text-slate-300 leading-relaxed font-light">
+                  <p className="text-sm text-slate-600 leading-relaxed font-medium">
                     {scores.explanation}
                   </p>
                 ) : (
-                  <p className="text-sm text-slate-500">AI Summary not available. Click re-evaluation to load.</p>
+                  <p className="text-sm text-slate-400 font-medium">AI Summary not available. Click re-evaluation to load.</p>
                 )}
               </div>
 
               {/* Suggestions list */}
               {scores && (
-                <div className="glass-panel p-6 rounded-2xl">
-                  <h3 className="text-base font-bold text-white mb-4 uppercase tracking-wider">Priority Improvements</h3>
+                <div className="glass-panel p-6 rounded-2xl border border-slate-200">
+                  <h3 className="text-base font-bold text-slate-800 mb-4 uppercase tracking-wider">Priority Improvements</h3>
                   <ul className="space-y-3">
                     {scores.improvement_suggestions.map((suggestion, index) => (
-                      <li key={index} className="flex gap-3 text-sm text-slate-300 leading-relaxed">
-                        <span className="w-5 h-5 rounded-full bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400 text-xs shrink-0 mt-0.5 font-bold">
+                      <li key={index} className="flex gap-3 text-sm text-slate-650 leading-relaxed">
+                        <span className="w-5 h-5 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 text-xs shrink-0 mt-0.5 font-bold">
                           {index + 1}
                         </span>
-                        <span>{suggestion}</span>
+                        <span className="text-slate-600 font-semibold">{suggestion}</span>
                       </li>
                     ))}
                   </ul>
@@ -368,13 +376,13 @@ const IdeaDetail = () => {
                   {/* Strengths */}
                   <div className="swot-s p-6 rounded-2xl">
                     <div className="flex items-center gap-2 mb-4">
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
-                      <h4 className="font-extrabold text-emerald-400 uppercase tracking-wider text-sm">Strengths</h4>
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                      <h4 className="font-bold uppercase tracking-wider text-sm">Strengths</h4>
                     </div>
                     <ul className="space-y-2.5">
                       {swot.strengths.map((str, i) => (
-                        <li key={i} className="text-sm text-slate-300 flex items-start gap-2 leading-relaxed">
-                          <Check size={14} className="text-emerald-400 mt-1 shrink-0" />
+                        <li key={i} className="text-sm flex items-start gap-2 leading-relaxed">
+                          <Check size={14} className="mt-1 shrink-0" />
                           <span>{str}</span>
                         </li>
                       ))}
@@ -384,13 +392,13 @@ const IdeaDetail = () => {
                   {/* Weaknesses */}
                   <div className="swot-w p-6 rounded-2xl">
                     <div className="flex items-center gap-2 mb-4">
-                      <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
-                      <h4 className="font-extrabold text-rose-400 uppercase tracking-wider text-sm">Weaknesses</h4>
+                      <span className="w-2.5 h-2.5 rounded-full bg-rose-600"></span>
+                      <h4 className="font-bold uppercase tracking-wider text-sm">Weaknesses</h4>
                     </div>
                     <ul className="space-y-2.5">
                       {swot.weaknesses.map((weak, i) => (
-                        <li key={i} className="text-sm text-slate-300 flex items-start gap-2 leading-relaxed">
-                          <X size={14} className="text-rose-400 mt-1 shrink-0" />
+                        <li key={i} className="text-sm flex items-start gap-2 leading-relaxed">
+                          <X size={14} className="mt-1 shrink-0" />
                           <span>{weak}</span>
                         </li>
                       ))}
@@ -400,13 +408,13 @@ const IdeaDetail = () => {
                   {/* Opportunities */}
                   <div className="swot-o p-6 rounded-2xl">
                     <div className="flex items-center gap-2 mb-4">
-                      <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-                      <h4 className="font-extrabold text-blue-400 uppercase tracking-wider text-sm">Opportunities</h4>
+                      <span className="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                      <h4 className="font-bold uppercase tracking-wider text-sm">Opportunities</h4>
                     </div>
                     <ul className="space-y-2.5">
                       {swot.opportunities.map((opp, i) => (
-                        <li key={i} className="text-sm text-slate-300 flex items-start gap-2 leading-relaxed">
-                          <span className="text-blue-400 font-bold shrink-0 mt-0.5">•</span>
+                        <li key={i} className="text-sm flex items-start gap-2 leading-relaxed">
+                          <span className="font-bold shrink-0 mt-0.5">•</span>
                           <span>{opp}</span>
                         </li>
                       ))}
@@ -416,13 +424,13 @@ const IdeaDetail = () => {
                   {/* Threats */}
                   <div className="swot-t p-6 rounded-2xl">
                     <div className="flex items-center gap-2 mb-4">
-                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                      <h4 className="font-extrabold text-amber-400 uppercase tracking-wider text-sm">Threats</h4>
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-650"></span>
+                      <h4 className="font-bold uppercase tracking-wider text-sm">Threats</h4>
                     </div>
                     <ul className="space-y-2.5">
                       {swot.threats.map((thr, i) => (
-                        <li key={i} className="text-sm text-slate-300 flex items-start gap-2 leading-relaxed">
-                          <span className="text-amber-400 font-bold shrink-0 mt-0.5">⚠️</span>
+                        <li key={i} className="text-sm flex items-start gap-2 leading-relaxed">
+                          <span className="font-bold shrink-0 mt-0.5">⚠️</span>
                           <span>{thr}</span>
                         </li>
                       ))}
@@ -431,12 +439,12 @@ const IdeaDetail = () => {
                 </div>
 
                 {/* Recommendations */}
-                <div className="glass-panel p-6 rounded-2xl">
-                  <h3 className="text-base font-bold text-white mb-4 uppercase tracking-wider">SWOT Strategic Action Plan</h3>
+                <div className="glass-panel p-6 rounded-2xl border border-slate-200 bg-white">
+                  <h3 className="text-base font-bold text-slate-800 mb-4 uppercase tracking-wider">SWOT Strategic Action Plan</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {swot.recommendations.map((rec, i) => (
-                      <div key={i} className="bg-slate-950/40 border border-slate-800 p-4 rounded-xl text-sm text-slate-300 leading-relaxed">
-                        <span className="text-sky-400 font-bold block mb-1 text-xs uppercase tracking-wider">Strategic Action {i+1}</span>
+                      <div key={i} className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-sm text-slate-700 leading-relaxed">
+                        <span className="text-blue-600 font-bold block mb-1 text-xs uppercase tracking-wider">Strategic Action {i+1}</span>
                         {rec}
                       </div>
                     ))}
@@ -444,7 +452,7 @@ const IdeaDetail = () => {
                 </div>
               </>
             ) : (
-              <div className="glass-panel p-12 text-center text-slate-500 text-sm">
+              <div className="glass-panel p-12 text-center text-slate-400 text-sm border border-slate-200 bg-white">
                 SWOT Analysis not generated yet.
               </div>
             )}
@@ -457,14 +465,14 @@ const IdeaDetail = () => {
             {competitors ? (
               <>
                 {/* Feature Comparison Table */}
-                <div className="glass-panel rounded-2xl overflow-hidden border border-slate-800/80">
-                  <div className="p-6 border-b border-slate-800/60">
-                    <h3 className="text-base font-bold text-white uppercase tracking-wider">Feature Comparison Matrix</h3>
+                <div className="glass-panel rounded-2xl overflow-hidden border border-slate-200 shadow-sm bg-white">
+                  <div className="p-6 border-b border-slate-200">
+                    <h3 className="text-base font-bold text-slate-800 uppercase tracking-wider">Feature Comparison Matrix</h3>
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm border-collapse">
                       <thead>
-                        <tr className="bg-slate-900/60 text-slate-300 border-b border-slate-800">
+                        <tr className="bg-slate-50 text-slate-700 border-b border-slate-200">
                           <th className="p-4 font-semibold">Competitor Name</th>
                           <th className="p-4 font-semibold">Market Position</th>
                           {competitors.competitors.length > 0 &&
@@ -473,38 +481,45 @@ const IdeaDetail = () => {
                             ))}
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-800">
+                      <tbody className="divide-y divide-slate-200">
                         {/* Render client platform first */}
-                        <tr className="bg-sky-500/5 hover:bg-sky-500/10 transition-colors">
-                          <td className="p-4 font-bold text-sky-400">
-                            {idea.name} <span className="text-[10px] bg-sky-500/15 px-2 py-0.5 rounded-full ml-2 text-sky-300 uppercase tracking-widest font-semibold">You</span>
+                        <tr className="bg-blue-50/30 hover:bg-blue-50 transition-colors">
+                          <td className="p-4 font-bold text-blue-600">
+                            {idea.name} <span className="text-[10px] bg-blue-100 px-2 py-0.5 rounded-full ml-2 text-blue-700 uppercase tracking-widest font-bold">You</span>
                           </td>
-                          <td className="p-4 text-slate-300 font-medium">Target disruptor</td>
+                          <td className="p-4 text-slate-700 font-medium">Target disruptor</td>
                           {competitors.competitors.length > 0 &&
                             Object.keys(competitors.competitors[0].comparison || {}).map((f) => (
                               <td key={f} className="p-4 text-center">
-                                <Check size={18} className="text-emerald-400 mx-auto" />
+                                <Check size={18} className="text-emerald-600 mx-auto" />
                               </td>
                             ))}
                         </tr>
 
                         {competitors.competitors.map((comp, idx) => (
-                          <tr key={idx} className="hover:bg-slate-900/30 transition-colors">
-                            <td className="p-4 font-bold text-white">
+                          <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                            <td className="p-4 font-bold text-slate-800">
                               {comp.name}
                               {comp.website && comp.website !== 'N/A' && (
-                                <span className="block text-[10px] text-slate-500 font-light mt-0.5">{comp.website}</span>
+                                <a 
+                                  href={formatUrl(comp.website)} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  className="block text-[10px] text-blue-600 hover:text-blue-700 hover:underline font-medium mt-0.5"
+                                >
+                                  {comp.website}
+                                </a>
                               )}
                             </td>
-                            <td className="p-4 text-slate-400 text-xs">
-                              {comp.category} • <span className="text-slate-300 font-medium">{comp.market_position}</span>
+                            <td className="p-4 text-slate-500 text-xs">
+                              {comp.category} • <span className="text-slate-700 font-medium">{comp.market_position}</span>
                             </td>
                             {Object.entries(comp.comparison || {}).map(([feature, val]) => (
                               <td key={feature} className="p-4 text-center">
                                 {val ? (
-                                  <Check size={18} className="text-emerald-500/80 mx-auto" />
+                                  <Check size={18} className="text-emerald-600 mx-auto" />
                                 ) : (
-                                  <X size={18} className="text-rose-500/60 mx-auto" />
+                                  <X size={18} className="text-rose-500 mx-auto" />
                                 )}
                               </td>
                             ))}
@@ -517,20 +532,20 @@ const IdeaDetail = () => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Gaps Analysis */}
-                  <div className="glass-panel p-6 rounded-2xl">
-                    <h3 className="text-base font-bold text-white mb-4 uppercase tracking-wider">Market Gap Analysis</h3>
-                    <p className="text-sm text-slate-300 leading-relaxed font-light">
+                  <div className="glass-panel p-6 rounded-2xl border border-slate-200 bg-white">
+                    <h3 className="text-base font-bold text-slate-800 mb-4 uppercase tracking-wider">Market Gap Analysis</h3>
+                    <p className="text-sm text-slate-650 leading-relaxed font-medium">
                       {competitors.market_gap_analysis}
                     </p>
                   </div>
 
                   {/* Differentiation Suggestions */}
-                  <div className="glass-panel p-6 rounded-2xl">
-                    <h3 className="text-base font-bold text-white mb-4 uppercase tracking-wider">How to Differentiate</h3>
+                  <div className="glass-panel p-6 rounded-2xl border border-slate-200 bg-white">
+                    <h3 className="text-base font-bold text-slate-800 mb-4 uppercase tracking-wider">How to Differentiate</h3>
                     <ul className="space-y-3">
                       {competitors.differentiation_suggestions.map((diff, index) => (
-                        <li key={index} className="flex gap-3 text-sm text-slate-300 leading-relaxed">
-                          <span className="w-5 h-5 rounded-full bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400 text-xs shrink-0 mt-0.5 font-bold">
+                        <li key={index} className="flex gap-3 text-sm text-slate-600 leading-relaxed font-medium">
+                          <span className="w-5 h-5 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-700 text-xs shrink-0 mt-0.5 font-bold">
                             {index + 1}
                           </span>
                           <span>{diff}</span>
@@ -541,7 +556,7 @@ const IdeaDetail = () => {
                 </div>
               </>
             ) : (
-              <div className="glass-panel p-12 text-center text-slate-500 text-sm">
+              <div className="glass-panel p-12 text-center text-slate-400 text-sm border border-slate-200 bg-white">
                 Competitor Intelligence report not generated yet.
               </div>
             )}
@@ -553,39 +568,39 @@ const IdeaDetail = () => {
           <div className="space-y-6">
             {revenue ? (
               <>
-                <div className="glass-panel p-6 rounded-2xl flex items-center justify-between bg-gradient-to-r from-slate-900 to-brand-950">
+                <div className="glass-panel p-6 rounded-2xl flex items-center justify-between border border-blue-100 bg-blue-50/30">
                   <div>
-                    <h4 className="text-xs text-slate-400 uppercase tracking-widest font-semibold">Recommended Business Model</h4>
-                    <span className="text-2xl font-black text-white mt-1 block">{revenue.recommended_model}</span>
+                    <h4 className="text-xs text-slate-500 uppercase tracking-widest font-semibold">Recommended Business Model</h4>
+                    <span className="text-2xl font-extrabold text-slate-900 mt-1 block">{revenue.recommended_model}</span>
                   </div>
-                  <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 border border-amber-500/20">
+                  <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-700 border border-emerald-100">
                     <DollarSign size={24} />
                   </div>
                 </div>
 
                 {/* Pricing Tiers cards */}
                 <div>
-                  <h3 className="text-base font-bold text-white mb-6 uppercase tracking-wider">Suggested Pricing Tiers</h3>
+                  <h3 className="text-base font-bold text-slate-800 mb-6 uppercase tracking-wider">Suggested Pricing Tiers</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {revenue.pricing_suggestions.map((tier, idx) => (
-                      <div key={idx} className="glass-card p-6 rounded-2xl border border-slate-800 flex flex-col justify-between h-full relative overflow-hidden">
+                      <div key={idx} className="glass-card p-6 rounded-2xl border border-slate-200 flex flex-col justify-between h-full relative overflow-hidden bg-white">
                         {idx === 1 && (
-                          <div className="absolute top-0 right-0 bg-sky-500 text-white text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-bl-xl">
+                          <div className="absolute top-0 right-0 bg-blue-600 text-white text-[9px] font-bold uppercase tracking-widest px-3 py-1 rounded-bl-xl">
                             Recommended
                           </div>
                         )}
                         <div>
                           <span className="text-xs text-slate-400 uppercase tracking-widest font-bold block mb-2">{tier.tier_name}</span>
                           <div className="flex items-baseline gap-1.5 mb-6">
-                            <span className="text-3xl font-extrabold text-white">{tier.price}</span>
+                            <span className="text-3xl font-extrabold text-slate-900">{tier.price}</span>
                             <span className="text-xs text-slate-500 font-medium">{tier.frequency}</span>
                           </div>
                           
                           <ul className="space-y-3 mb-8">
                             {tier.features.map((f, i) => (
-                              <li key={i} className="text-xs text-slate-300 flex items-start gap-2 leading-relaxed">
-                                <Check size={12} className="text-sky-400 mt-0.5 shrink-0" />
-                                <span>{f}</span>
+                              <li key={i} className="text-xs text-slate-650 flex items-start gap-2 leading-relaxed">
+                                <Check size={12} className="text-blue-600 mt-0.5 shrink-0" />
+                                <span className="text-slate-650">{f}</span>
                               </li>
                             ))}
                           </ul>
@@ -596,15 +611,15 @@ const IdeaDetail = () => {
                 </div>
 
                 {/* Rationale */}
-                <div className="glass-panel p-6 rounded-2xl">
-                  <h3 className="text-base font-bold text-white mb-4 uppercase tracking-wider">Monetization & Pricing Rationale</h3>
-                  <p className="text-sm text-slate-300 leading-relaxed font-light">
+                <div className="glass-panel p-6 rounded-2xl border border-slate-200">
+                  <h3 className="text-base font-bold text-slate-800 mb-4 uppercase tracking-wider">Monetization & Pricing Rationale</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">
                     {revenue.revenue_rationale}
                   </p>
                 </div>
               </>
             ) : (
-              <div className="glass-panel p-12 text-center text-slate-500 text-sm">
+              <div className="glass-panel p-12 text-center text-slate-400 text-sm border border-slate-200 bg-white">
                 Revenue strategy report not generated yet.
               </div>
             )}
@@ -617,79 +632,79 @@ const IdeaDetail = () => {
             {canvas ? (
               <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
                 {/* Column 1: Key Partners */}
-                <div className="lg:col-span-1 glass-panel p-5 rounded-2xl min-h-[220px] flex flex-col">
-                  <h4 className="text-xs font-extrabold text-sky-400 uppercase tracking-wider mb-3">Key Partners</h4>
-                  <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-line flex-1 font-light">
+                <div className="lg:col-span-1 glass-panel p-5 rounded-2xl min-h-[220px] flex flex-col border border-slate-200">
+                  <h4 className="text-xs font-extrabold text-blue-600 uppercase tracking-wider mb-3">Key Partners</h4>
+                  <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-line flex-1">
                     {canvas.key_partners}
                   </p>
                 </div>
 
                 {/* Column 2: Key Activities & Resources */}
                 <div className="lg:col-span-1 flex flex-col gap-4">
-                  <div className="glass-panel p-5 rounded-2xl flex-1 flex flex-col min-h-[110px]">
-                    <h4 className="text-xs font-extrabold text-sky-400 uppercase tracking-wider mb-3">Key Activities</h4>
-                    <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-line flex-1 font-light">
+                  <div className="glass-panel p-5 rounded-2xl flex-1 flex flex-col min-h-[110px] border border-slate-200">
+                    <h4 className="text-xs font-extrabold text-blue-600 uppercase tracking-wider mb-3">Key Activities</h4>
+                    <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-line flex-1">
                       {canvas.key_activities}
                     </p>
                   </div>
-                  <div className="glass-panel p-5 rounded-2xl flex-1 flex flex-col min-h-[110px]">
-                    <h4 className="text-xs font-extrabold text-sky-400 uppercase tracking-wider mb-3">Key Resources</h4>
-                    <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-line flex-1 font-light">
+                  <div className="glass-panel p-5 rounded-2xl flex-1 flex flex-col min-h-[110px] border border-slate-200">
+                    <h4 className="text-xs font-extrabold text-blue-600 uppercase tracking-wider mb-3">Key Resources</h4>
+                    <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-line flex-1">
                       {canvas.key_resources}
                     </p>
                   </div>
                 </div>
 
                 {/* Column 3: Value Propositions */}
-                <div className="lg:col-span-1 glass-panel p-5 rounded-2xl min-h-[220px] flex flex-col bg-sky-500/5 border-sky-500/20">
-                  <h4 className="text-xs font-extrabold text-sky-300 uppercase tracking-wider mb-3">Value Propositions</h4>
-                  <p className="text-xs text-slate-200 leading-relaxed whitespace-pre-line flex-1 font-medium">
+                <div className="lg:col-span-1 glass-panel p-5 rounded-2xl min-h-[220px] flex flex-col bg-blue-50/50 border border-blue-200">
+                  <h4 className="text-xs font-extrabold text-blue-700 uppercase tracking-wider mb-3">Value Propositions</h4>
+                  <p className="text-xs text-slate-800 leading-relaxed whitespace-pre-line flex-1 font-medium">
                     {canvas.value_proposition}
                   </p>
                 </div>
 
                 {/* Column 4: Relationships & Channels */}
                 <div className="lg:col-span-1 flex flex-col gap-4">
-                  <div className="glass-panel p-5 rounded-2xl flex-1 flex flex-col min-h-[110px]">
-                    <h4 className="text-xs font-extrabold text-sky-400 uppercase tracking-wider mb-3">Customer Relationships</h4>
-                    <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-line flex-1 font-light">
+                  <div className="glass-panel p-5 rounded-2xl flex-1 flex flex-col min-h-[110px] border border-slate-200">
+                    <h4 className="text-xs font-extrabold text-blue-600 uppercase tracking-wider mb-3">Customer Relationships</h4>
+                    <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-line flex-1">
                       {canvas.customer_relationships}
                     </p>
                   </div>
-                  <div className="glass-panel p-5 rounded-2xl flex-1 flex flex-col min-h-[110px]">
-                    <h4 className="text-xs font-extrabold text-sky-400 uppercase tracking-wider mb-3">Channels</h4>
-                    <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-line flex-1 font-light">
+                  <div className="glass-panel p-5 rounded-2xl flex-1 flex flex-col min-h-[110px] border border-slate-200">
+                    <h4 className="text-xs font-extrabold text-blue-600 uppercase tracking-wider mb-3">Channels</h4>
+                    <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-line flex-1">
                       {canvas.channels}
                     </p>
                   </div>
                 </div>
 
                 {/* Column 5: Customer Segments */}
-                <div className="lg:col-span-1 glass-panel p-5 rounded-2xl min-h-[220px] flex flex-col">
-                  <h4 className="text-xs font-extrabold text-sky-400 uppercase tracking-wider mb-3">Customer Segments</h4>
-                  <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-line flex-1 font-light">
+                <div className="lg:col-span-1 glass-panel p-5 rounded-2xl min-h-[220px] flex flex-col border border-slate-200">
+                  <h4 className="text-xs font-extrabold text-blue-600 uppercase tracking-wider mb-3">Customer Segments</h4>
+                  <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-line flex-1">
                     {canvas.customer_segments}
                   </p>
                 </div>
 
                 {/* Cost & Revenue Bottom row */}
                 <div className="lg:col-span-5 grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="glass-panel p-5 rounded-2xl min-h-[120px]">
-                    <h4 className="text-xs font-extrabold text-sky-400 uppercase tracking-wider mb-3">Cost Structure</h4>
-                    <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-line font-light">
+                  <div className="glass-panel p-5 rounded-2xl min-h-[120px] border border-slate-200">
+                    <h4 className="text-xs font-extrabold text-blue-600 uppercase tracking-wider mb-3">Cost Structure</h4>
+                    <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-line">
                       {canvas.cost_structure}
                     </p>
                   </div>
-                  <div className="glass-panel p-5 rounded-2xl min-h-[120px]">
-                    <h4 className="text-xs font-extrabold text-sky-400 uppercase tracking-wider mb-3">Revenue Streams</h4>
-                    <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-line font-light">
+                  <div className="glass-panel p-5 rounded-2xl min-h-[120px] border border-slate-200">
+                    <h4 className="text-xs font-extrabold text-blue-600 uppercase tracking-wider mb-3">Revenue Streams</h4>
+                    <p className="text-xs text-slate-700 leading-relaxed whitespace-pre-line">
                       {canvas.revenue_streams}
                     </p>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="glass-panel p-12 text-center text-slate-500 text-sm">
+              <div className="glass-panel p-12 text-center text-slate-400 text-sm border border-slate-200">
                 Business Model Canvas has not been generated yet.
               </div>
             )}
@@ -704,20 +719,20 @@ const IdeaDetail = () => {
                 {/* Actual slide display card */}
                 <div 
                   key={currentSlideIndex} 
-                  className="bg-slate-900 border border-slate-800 rounded-2xl p-10 min-h-[380px] flex flex-col justify-between shadow-2xl relative animate-scale-in"
+                  className="bg-white border border-slate-200 rounded-2xl p-10 min-h-[380px] flex flex-col justify-between shadow-sm relative animate-scale-in"
                 >
-                  <div className="absolute top-4 right-6 text-xs text-slate-500 font-semibold">
+                  <div className="absolute top-4 right-6 text-xs text-slate-400 font-bold">
                     SLIDE {pitch_deck.slides[currentSlideIndex].slide_number} OF {pitch_deck.slides.length}
                   </div>
 
                   <div>
-                    <h3 className="text-xl sm:text-2xl font-extrabold text-white mb-6 pr-10">
+                    <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 mb-6 pr-10">
                       {pitch_deck.slides[currentSlideIndex].title}
                     </h3>
                     <ul className="space-y-4">
                       {pitch_deck.slides[currentSlideIndex].bullets.map((b, idx) => (
-                        <li key={idx} className="text-sm sm:text-base text-slate-300 flex items-start gap-3 leading-relaxed font-light">
-                          <span className="w-2 h-2 rounded-full bg-sky-500 shrink-0 mt-2"></span>
+                        <li key={idx} className="text-sm sm:text-base text-slate-650 flex items-start gap-3 leading-relaxed">
+                          <span className="w-2 h-2 rounded-full bg-blue-600 shrink-0 mt-2"></span>
                           <span>{b}</span>
                         </li>
                       ))}
@@ -725,9 +740,9 @@ const IdeaDetail = () => {
                   </div>
 
                   {/* Design layout tip */}
-                  <div className="border-t border-slate-800/80 pt-6 mt-8">
-                    <span className="text-[10px] text-sky-400 font-bold uppercase tracking-widest block mb-1">Visual Layout Suggestion</span>
-                    <p className="text-xs text-slate-400 italic">
+                  <div className="border-t border-slate-100 pt-6 mt-8">
+                    <span className="text-[10px] text-blue-600 font-bold uppercase tracking-widest block mb-1">Visual Layout Suggestion</span>
+                    <p className="text-xs text-slate-500 italic">
                       {pitch_deck.slides[currentSlideIndex].visual_suggestion}
                     </p>
                   </div>
@@ -738,7 +753,7 @@ const IdeaDetail = () => {
                   <button
                     disabled={currentSlideIndex === 0}
                     onClick={() => setCurrentSlideIndex((prev) => prev - 1)}
-                    className="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-semibold py-2 px-4 rounded-xl flex items-center gap-1 text-sm disabled:opacity-30 disabled:pointer-events-none transition-all"
+                    className="bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-xl flex items-center gap-1 text-sm disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
                   >
                     <ChevronLeft size={16} />
                     Previous Slide
@@ -750,7 +765,7 @@ const IdeaDetail = () => {
                         key={i}
                         onClick={() => setCurrentSlideIndex(i)}
                         className={`w-2 h-2 rounded-full transition-all shrink-0 ${
-                          currentSlideIndex === i ? 'bg-sky-500 w-4' : 'bg-slate-700 hover:bg-slate-600'
+                          currentSlideIndex === i ? 'bg-blue-600 w-4' : 'bg-slate-200 hover:bg-slate-300'
                         }`}
                       ></button>
                     ))}
@@ -759,7 +774,7 @@ const IdeaDetail = () => {
                   <button
                     disabled={currentSlideIndex === pitch_deck.slides.length - 1}
                     onClick={() => setCurrentSlideIndex((prev) => prev + 1)}
-                    className="bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-semibold py-2 px-4 rounded-xl flex items-center gap-1 text-sm disabled:opacity-30 disabled:pointer-events-none transition-all"
+                    className="bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-xl flex items-center gap-1 text-sm disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
                   >
                     Next Slide
                     <ChevronRight size={16} />
@@ -767,7 +782,7 @@ const IdeaDetail = () => {
                 </div>
               </div>
             ) : (
-              <div className="glass-panel p-12 text-center text-slate-500 text-sm">
+              <div className="glass-panel p-12 text-center text-slate-400 text-sm border border-slate-200 bg-white">
                 Pitch Deck slides have not been generated yet.
               </div>
             )}
@@ -780,25 +795,25 @@ const IdeaDetail = () => {
             {scores ? (
               <>
                 {/* Customer Acquisition Ideas */}
-                <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+                <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between border border-slate-200 bg-white shadow-sm">
                   <div>
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-400 border border-teal-500/20">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-700 border border-emerald-100">
                         <Award size={20} />
                       </div>
-                      <h3 className="text-base font-bold text-white uppercase tracking-wider">Customer Acquisition Tactics</h3>
+                      <h3 className="text-base font-bold text-slate-800 uppercase tracking-wider">Customer Acquisition Tactics</h3>
                     </div>
                     <ul className="space-y-4">
-                      <li className="text-sm text-slate-300 leading-relaxed">
-                        <span className="text-teal-400 font-bold block mb-1 text-xs uppercase">Leverage Content Loops</span>
+                      <li className="text-sm text-slate-650 leading-relaxed">
+                        <span className="text-emerald-750 font-bold block mb-1 text-xs uppercase">Leverage Content Loops</span>
                         Create data-driven templates or calculators related to {idea.industry} to gather leads organically.
                       </li>
-                      <li className="text-sm text-slate-300 leading-relaxed">
-                        <span className="text-teal-400 font-bold block mb-1 text-xs uppercase">Niche Community Outreach</span>
+                      <li className="text-sm text-slate-650 leading-relaxed">
+                        <span className="text-emerald-750 font-bold block mb-1 text-xs uppercase">Niche Community Outreach</span>
                         Engage directly in specific forums, Slack networks, or subreddits where {idea.target_audience} congregates.
                       </li>
-                      <li className="text-sm text-slate-300 leading-relaxed">
-                        <span className="text-teal-400 font-bold block mb-1 text-xs uppercase">Targeted Partnerships</span>
+                      <li className="text-sm text-slate-650 leading-relaxed">
+                        <span className="text-emerald-750 font-bold block mb-1 text-xs uppercase">Targeted Partnerships</span>
                         Integrate or partner with non-competing softwares currently used by your customer segments to gain instant visibility.
                       </li>
                     </ul>
@@ -806,31 +821,31 @@ const IdeaDetail = () => {
                 </div>
 
                 {/* Go-To-Market Plan */}
-                <div className="glass-panel p-6 rounded-2xl">
+                <div className="glass-panel p-6 rounded-2xl border border-slate-200 bg-white shadow-sm">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/20">
+                    <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 border border-blue-100">
                       <Briefcase size={20} />
                     </div>
-                    <h3 className="text-base font-bold text-white uppercase tracking-wider">Launch & GTM Blueprint</h3>
+                    <h3 className="text-base font-bold text-slate-800 uppercase tracking-wider">Launch & GTM Blueprint</h3>
                   </div>
                   <div className="space-y-4">
-                    <div className="border-l-2 border-indigo-500 pl-4 space-y-1">
-                      <span className="text-xs font-semibold text-slate-400 block uppercase">Phase 1: Private Alpha (Weeks 1-4)</span>
-                      <p className="text-xs text-slate-300 leading-relaxed">
+                    <div className="border-l-2 border-blue-500 pl-4 space-y-1">
+                      <span className="text-xs font-bold text-slate-450 block uppercase">Phase 1: Private Alpha (Weeks 1-4)</span>
+                      <p className="text-xs text-slate-600 leading-relaxed">
                         Onboard 10-15 design partners from {idea.target_audience} on a manual, high-touch basis to iron out onboarding friction.
                       </p>
                     </div>
 
                     <div className="border-l-2 border-sky-500 pl-4 space-y-1">
-                      <span className="text-xs font-semibold text-slate-400 block uppercase">Phase 2: Beta Launch (Weeks 5-8)</span>
-                      <p className="text-xs text-slate-300 leading-relaxed">
+                      <span className="text-xs font-bold text-slate-450 block uppercase">Phase 2: Beta Launch (Weeks 5-8)</span>
+                      <p className="text-xs text-slate-600 leading-relaxed">
                         Introduce self-serve subscription pricing, list on directories like Product Hunt and BetaList, and launch seed email loops.
                       </p>
                     </div>
 
-                    <div className="border-l-2 border-teal-500 pl-4 space-y-1">
-                      <span className="text-xs font-semibold text-slate-400 block uppercase">Phase 3: Scale Engine (Weeks 9+)</span>
-                      <p className="text-xs text-slate-300 leading-relaxed">
+                    <div className="border-l-2 border-emerald-500 pl-4 space-y-1">
+                      <span className="text-xs font-bold text-slate-450 block uppercase">Phase 3: Scale Engine (Weeks 9+)</span>
+                      <p className="text-xs text-slate-600 leading-relaxed">
                         Activate referral programs and transition from organic validation to paid search ads focused on conversion funnels.
                       </p>
                     </div>
@@ -838,7 +853,7 @@ const IdeaDetail = () => {
                 </div>
               </>
             ) : (
-              <div className="glass-panel p-12 text-center text-slate-500 text-sm">
+              <div className="glass-panel p-12 text-center text-slate-400 text-sm border border-slate-200 bg-white">
                 Mentor advice is compile-linked with AI score evaluation. Generate evaluation to view.
               </div>
             )}

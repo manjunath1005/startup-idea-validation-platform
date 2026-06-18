@@ -54,3 +54,21 @@ def get_idea(
             detail="Startup idea not found."
         )
     return idea
+
+
+@router.delete("/{idea_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_idea(
+    idea_id: UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    idea = db.query(StartupIdea).filter(StartupIdea.id == idea_id, StartupIdea.user_id == current_user.id).first()
+    if not idea:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Startup idea not found."
+        )
+    db.delete(idea)
+    db.commit()
+    return
+

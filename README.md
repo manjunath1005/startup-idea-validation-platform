@@ -9,7 +9,7 @@ An AI-powered, production-ready full stack platform that helps founders evaluate
 - **Frontend**: React.js (Vite), Tailwind CSS, Recharts (Radar/Bar score graphics), Axios, Lucide Icons
 - **Backend**: FastAPI (Python), SQLAlchemy ORM, Uvicorn ASGI server, JWT-based security (Passlib/Bcrypt)
 - **Database**: PostgreSQL (fallback support for SQLite)
-- **AI Engine**: Google Gemini API via structured JSON schemas (`gemini-1.5-flash`)
+- **AI Engine**: Google Gemini API via structured JSON schemas (`gemini-3.1-flash-lite`)
 - **PDF Export**: Native PDF compilation via ReportLab
 - **Containerization**: Docker & Docker Compose
 

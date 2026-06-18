@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     SMTP_FROM: str = os.getenv("SMTP_FROM", "no-reply@startupvalidation.com")
     
     RESEND_API_KEY: str = os.getenv("RESEND_API_KEY", "")
+    RESEND_FROM: str = os.getenv("RESEND_FROM", "onboarding@resend.dev")
+
 
     class Config:
         env_file = ".env"

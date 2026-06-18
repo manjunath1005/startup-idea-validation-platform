@@ -62,11 +62,8 @@ def send_otp_email(to_email: str, otp: str) -> bool:
             "Content-Type": "application/json"
         }
         
-        # If user did not configure a custom verified domain on Resend, they must send from onboarding@resend.dev
-        from_email = settings.SMTP_FROM
-        if "onboarding@resend.dev" in from_email or not ("@" in from_email and not from_email.endswith("startupvalidation.com")):
-            if "startupvalidation.com" in from_email:
-                from_email = "onboarding@resend.dev"
+        # Uses settings.RESEND_FROM (defaults to onboarding@resend.dev for free accounts)
+        from_email = settings.RESEND_FROM
         
         data = {
             "from": from_email,

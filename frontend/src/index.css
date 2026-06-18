@@ -77,85 +77,91 @@
 
 /* Shimmer background skeleton loader utility */
 .shimmer-bg {
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 25%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.03) 75%);
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.03) 25%, rgba(0, 0, 0, 0.06) 50%, rgba(0, 0, 0, 0.03) 75%);
   background-size: 200% 100%;
 }
 
 
 /* Base Body Style */
 body {
-  @apply bg-brand-950 text-slate-100 min-h-screen font-sans antialiased;
-  background-image: radial-gradient(circle at 50% 0%, #0c4a6e 0%, #030712 70%);
+  background-color: #F8FAFC;
+  color: #0F172A;
+  min-height: 100vh;
+  font-family: 'Outfit', 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Glassmorphism custom classes */
+/* Corporate Premium Cards and Panels */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.05), 0 1px 2px 0 rgba(15, 23, 42, 0.03);
 }
 
 .glass-card {
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card:hover {
-  border-color: rgba(14, 165, 233, 0.3);
-  box-shadow: 0 0 20px rgba(14, 165, 233, 0.1);
-  transform: translateY(-2px);
+  border-color: #CBD5E1;
+  box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
 }
 
 .glass-input {
-  background: rgba(3, 7, 18, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  @apply rounded-xl px-4 py-3 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500/50 focus:border-sky-500 transition-all duration-300;
+  background: #FFFFFF;
+  border: 1px solid #D1D5DB;
+  color: #0F172A;
+  @apply rounded-xl px-4 py-3 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200;
 }
 
 /* Custom text gradients */
 .text-gradient-sky {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-sky-400 via-blue-400 to-indigo-400;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-sky-500;
 }
 
 .text-gradient-teal {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-emerald-400;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-emerald-600;
 }
 
-/* SWOT Custom Quadrants */
+/* SWOT Custom Quadrants for Light Mode */
 .swot-s {
-  background: rgba(16, 185, 129, 0.05);
-  border: 1px solid rgba(16, 185, 129, 0.15);
+  background: #ECFDF5;
+  border: 1px solid #A7F3D0;
+  color: #065F46;
 }
 .swot-w {
-  background: rgba(239, 68, 68, 0.05);
-  border: 1px solid rgba(239, 68, 68, 0.15);
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
 }
 .swot-o {
-  background: rgba(59, 130, 246, 0.05);
-  border: 1px solid rgba(59, 130, 246, 0.15);
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1E40AF;
 }
 .swot-t {
-  background: rgba(245, 158, 11, 0.05);
-  border: 1px solid rgba(245, 158, 11, 0.15);
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  color: #92400E;
 }
 
-/* Webkit custom scrollbars */
+/* Webkit custom scrollbars for Light Mode */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(3, 7, 18, 0.3);
+  background: #F1F5F9;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: #CBD5E1;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #94A3B8;
 }
+

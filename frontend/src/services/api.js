@@ -72,6 +72,11 @@ export const startupService = {
     const response = await api.get(`/startup/${ideaId}`);
     return response.data;
   },
+
+  deleteIdea: async (ideaId) => {
+    const response = await api.delete(`/startup/${ideaId}`);
+    return response.data;
+  },
 };
 
 export const analysisService = {

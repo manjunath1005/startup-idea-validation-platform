@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { LayoutDashboard, PlusCircle, User, LogOut, Lightbulb, Menu, X } from 'lucide-react';
+import { LayoutDashboard, PlusCircle, LogOut, Lightbulb, Menu, X } from 'lucide-react';
 
 const Layout = () => {
   const { user, logout } = useAuth();
@@ -20,24 +20,26 @@ const Layout = () => {
   ];
 
   return (
-    <div className="flex min-h-screen bg-brand-950 text-slate-100 overflow-hidden font-sans">
+    <div className="flex min-h-screen bg-slate-50 text-slate-900 overflow-hidden font-sans">
       {/* Background ambient lighting */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-sky-500/5 rounded-full blur-3xl pointer-events-none z-0"></div>
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-3xl pointer-events-none z-0"></div>
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-500/2 rounded-full blur-3xl pointer-events-none z-0"></div>
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-500/2 rounded-full blur-3xl pointer-events-none z-0"></div>
 
       {/* Sidebar for Desktop */}
-      <aside className="hidden md:flex flex-col w-64 glass-panel m-4 mr-0 rounded-2xl border-r border-slate-800/50 z-10 shrink-0">
-        <div className="p-6 flex items-center gap-3 border-b border-slate-800/40">
-          <div className="w-10 h-10 bg-sky-500/10 border border-sky-500/20 rounded-xl flex items-center justify-center text-sky-400">
-            <Lightbulb size={22} className="animate-pulse" />
+      <aside className="hidden md:flex flex-col w-60 bg-white border-r border-slate-200 z-10 shrink-0">
+        {/* Sidebar Header */}
+        <div className="p-4 flex items-center gap-2.5 border-b border-slate-100">
+          <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 border border-blue-100">
+            <Lightbulb size={18} />
           </div>
           <div>
-            <span className="font-bold text-white block text-sm tracking-wide">IDEA VALIDATOR</span>
-            <span className="text-[10px] text-sky-400 font-semibold uppercase tracking-wider">AI Platform</span>
+            <span className="font-semibold text-slate-900 block text-xs tracking-tight">Idea Validator</span>
+            <span className="text-[9px] text-slate-400 font-medium block uppercase tracking-widest -mt-0.5">AI Engine</span>
           </div>
         </div>
 
-        <nav className="flex-1 px-4 py-6 space-y-2">
+        {/* Sidebar Navigation */}
+        <nav className="flex-1 px-3 py-4 space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -45,13 +47,13 @@ const Layout = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-300 ${
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                   isActive
-                    ? 'bg-sky-500/10 border border-sky-500/30 text-white font-semibold shadow-md shadow-sky-500/5'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-900/40 border border-transparent'
+                    ? 'bg-slate-100 text-slate-900 font-semibold'
+                    : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
                 }`}
               >
-                <Icon size={18} className={isActive ? 'text-sky-400' : 'text-slate-400'} />
+                <Icon size={16} className={isActive ? 'text-slate-800' : 'text-slate-400'} />
                 {item.name}
               </Link>
             );
@@ -59,21 +61,25 @@ const Layout = () => {
         </nav>
 
         {/* User Card & Logout */}
-        <div className="p-4 border-t border-slate-800/40 space-y-3">
-          <div className="flex items-center gap-3 px-3 py-2">
-            <div className="w-9 h-9 bg-slate-800 rounded-xl flex items-center justify-center text-sky-400 border border-slate-700 font-bold">
-              {user?.full_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase()}
+        <div className="p-3 border-t border-slate-100 space-y-2">
+          <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg bg-slate-50/50 border border-slate-100">
+            <div className="w-7 h-7 bg-slate-100 rounded-full flex items-center justify-center text-slate-700 border border-slate-200 text-xs font-semibold uppercase">
+              {user?.full_name?.charAt(0) || user?.email?.charAt(0) || 'F'}
             </div>
             <div className="overflow-hidden">
-              <span className="text-sm font-medium text-white block truncate">{user?.full_name || 'Founder'}</span>
-              <span className="text-[11px] text-slate-500 block truncate">{user?.email}</span>
+              <span className="text-xs font-semibold text-slate-800 block truncate leading-none mb-1">
+                {user?.full_name || 'Founder'}
+              </span>
+              <span className="text-[10px] text-slate-400 block truncate leading-none">
+                {user?.email}
+              </span>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all duration-300"
+            className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:text-red-600 hover:bg-red-50/50 transition-all cursor-pointer"
           >
-            <LogOut size={16} />
+            <LogOut size={14} />
             Sign Out
           </button>
         </div>
@@ -82,16 +88,16 @@ const Layout = () => {
       {/* Main View Area */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden z-10 relative">
         {/* Top Header */}
-        <header className="flex items-center justify-between px-6 py-4 border-b border-slate-800/40 bg-brand-950/20 backdrop-blur-md">
+        <header className="flex items-center justify-between px-6 py-4 border-b border-slate-200 bg-white/80 backdrop-blur-md">
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="p-2 -ml-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-900/60 md:hidden"
+            className="p-1.5 -ml-1 rounded-lg text-slate-550 hover:text-slate-800 hover:bg-slate-100 md:hidden"
           >
-            <Menu size={24} />
+            <Menu size={20} />
           </button>
 
           <div className="hidden md:block">
-            <h1 className="text-lg font-bold text-white uppercase tracking-wider">
+            <h1 className="text-xs font-bold text-slate-400 uppercase tracking-widest font-mono">
               {location.pathname === '/dashboard'
                 ? 'Your Startups'
                 : location.pathname === '/submit'
@@ -102,27 +108,33 @@ const Layout = () => {
 
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <span className="text-xs text-slate-400 block">Workspace</span>
-              <span className="text-xs text-sky-400 font-medium">Personal Account</span>
+              <span className="text-[9px] text-slate-400 block uppercase tracking-widest font-bold">Workspace</span>
+              <span className="text-xs text-blue-600 font-semibold">Personal Account</span>
             </div>
           </div>
         </header>
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm md:hidden">
-            <div className="absolute top-0 left-0 bottom-0 w-64 bg-brand-950 border-r border-slate-800 p-6 flex flex-col justify-between">
+          <div className="fixed inset-0 z-50 bg-slate-900/30 backdrop-blur-sm md:hidden">
+            <div className="absolute top-0 left-0 bottom-0 w-60 bg-white border-r border-slate-200 p-4 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between pb-6 border-b border-slate-800">
-                  <div className="flex items-center gap-3">
-                    <Lightbulb size={24} className="text-sky-400" />
-                    <span className="font-bold text-white text-sm">IDEA VALIDATOR</span>
+                <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-blue-600 border border-blue-100">
+                      <Lightbulb size={18} />
+                    </div>
+                    <div>
+                      <span className="font-semibold text-slate-900 text-xs block leading-none mb-1">Idea Validator</span>
+                      <span className="text-[9px] text-slate-400 font-semibold uppercase tracking-widest block leading-none">AI Platform</span>
+                    </div>
                   </div>
-                  <button onClick={() => setMobileMenuOpen(false)} className="text-slate-400 hover:text-white">
-                    <X size={20} />
+                  <button onClick={() => setMobileMenuOpen(false)} className="p-1 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100">
+                    <X size={18} />
                   </button>
                 </div>
-                <nav className="py-6 space-y-2">
+
+                <nav className="py-4 space-y-1">
                   {navItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = location.pathname === item.path;
@@ -131,34 +143,35 @@ const Layout = () => {
                         key={item.path}
                         to={item.path}
                         onClick={() => setMobileMenuOpen(false)}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                        className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                           isActive
-                            ? 'bg-sky-500/10 text-white'
-                            : 'text-slate-400 hover:text-white hover:bg-slate-900/40'
+                            ? 'bg-slate-100 text-slate-900 font-semibold'
+                            : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
                         }`}
                       >
-                        <Icon size={18} />
+                        <Icon size={16} className={isActive ? 'text-slate-800' : 'text-slate-400'} />
                         {item.name}
                       </Link>
                     );
                   })}
                 </nav>
               </div>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 border-t border-slate-800 pt-4">
-                  <div className="w-8 h-8 bg-slate-800 rounded-full flex items-center justify-center font-bold text-sky-400 text-sm">
-                    {user?.full_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase()}
+
+              <div className="space-y-2">
+                <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg bg-slate-50 border border-slate-100">
+                  <div className="w-7 h-7 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-700 border border-slate-200 text-xs">
+                    {user?.full_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || 'F'}
                   </div>
                   <div>
-                    <span className="text-xs font-semibold text-white block">{user?.full_name || 'Founder'}</span>
-                    <span className="text-[10px] text-slate-500 block">{user?.email}</span>
+                    <span className="text-xs font-semibold text-slate-850 block leading-none mb-1">{user?.full_name || 'Founder'}</span>
+                    <span className="text-[10px] text-slate-400 block leading-none">{user?.email}</span>
                   </div>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-500/10"
+                  className="w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-xs font-medium text-slate-500 hover:text-red-650 hover:bg-red-50/50 transition-all cursor-pointer"
                 >
-                  <LogOut size={16} />
+                  <LogOut size={14} />
                   Sign Out
                 </button>
               </div>
