@@ -17,6 +17,14 @@ class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordConfirm(BaseModel):
+    email: EmailStr
+    otp: str
+    new_password: str = Field(..., min_length=6)
+
 class UserResponse(BaseModel):
     id: UUID
     email: EmailStr

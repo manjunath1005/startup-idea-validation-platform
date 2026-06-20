@@ -7,7 +7,7 @@ from email_validator import validate_email, EmailNotValidError
 
 from app.database import get_db
 from app.models import User, OTPVerification
-from app.schemas import UserCreate, UserLogin, UserResponse, Token, OTPRequest
+from app.schemas import UserCreate, UserLogin, UserResponse, Token, OTPRequest, ForgotPasswordRequest, ResetPasswordConfirm
 from app.auth import get_password_hash, verify_password, create_access_token, get_current_user
 from app.services.email import send_otp_email
 
@@ -167,3 +167,95 @@ def login_swagger(form_data: OAuth2PasswordRequestForm = Depends(), db: Session 
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@router.post("/forgot-password", status_code=status.HTTP_200_OK)
+def forgot_password(req: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    email = req.email.strip().lower()
+    
+    # Verify user exists
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No user with this email address was found."
+        )
+
+    # Clean up older OTP records for this email
+    db.query(OTPVerification).filter(OTPVerification.email == email).delete()
+
+    # Generate random 6-digit OTP
+    otp = f"{random.randint(100000, 999999)}"
+
+    # Create new OTP record valid for 10 minutes
+    expires_at = datetime.utcnow() + timedelta(minutes=10)
+    db_otp = OTPVerification(
+        email=email,
+        otp=otp,
+        expires_at=expires_at
+    )
+    db.add(db_otp)
+    db.commit()
+
+    # Send the OTP
+    email_failed = False
+    try:
+        send_otp_email(email, otp)
+    except Exception as e:
+        email_failed = True
+        print(f"Warning: Forgot password email delivery failed: {str(e)}")
+
+    if email_failed:
+        return {
+            "message": f"Verification code generated (Demo Mode: {otp})"
+        }
+
+    return {"message": f"Verification code sent successfully to {email}."}
+
+
+@router.post("/reset-password", status_code=status.HTTP_200_OK)
+def reset_password(req: ResetPasswordConfirm, db: Session = Depends(get_db)):
+    email = req.email.strip().lower()
+    
+    # Check user exists
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No user with this email address was found."
+        )
+
+    # Get the latest OTP record
+    otp_record = db.query(OTPVerification).filter(
+        OTPVerification.email == email
+    ).order_by(OTPVerification.created_at.desc()).first()
+
+    if not otp_record:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No OTP verification code has been requested. Please request one first."
+        )
+
+    # Check expiry
+    if otp_record.expires_at < datetime.utcnow():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="The verification code has expired. Please request a new one."
+        )
+
+    # Check match
+    if otp_record.otp != req.otp.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Incorrect verification code. Please check your email and try again."
+        )
+
+    # Reset the password
+    user.hashed_password = get_password_hash(req.new_password)
+    
+    # Clean up OTP records
+    db.query(OTPVerification).filter(OTPVerification.email == email).delete()
+    
+    db.commit()
+    
+    return {"message": "Your password has been successfully reset. You can now log in."}

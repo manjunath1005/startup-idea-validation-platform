@@ -53,7 +53,46 @@ def send_otp_email(to_email: str, otp: str) -> bool:
     </html>
     """
 
-    # 1. Try Resend HTTP API (recommended for Render Free Tier)
+    # 1. Try Brevo HTTP API
+    if settings.BREVO_API_KEY:
+        print("BREVO_API_KEY configured. Sending via Brevo API...")
+        url = "https://api.brevo.com/v3/smtp/email"
+        headers = {
+            "api-key": settings.BREVO_API_KEY,
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        }
+        
+        data = {
+            "sender": {
+                "name": settings.BREVO_SENDER_NAME,
+                "email": settings.BREVO_SENDER_EMAIL
+            },
+            "to": [{"email": to_email}],
+            "subject": f"Your Verification OTP: {otp}",
+            "htmlContent": html_body
+        }
+        
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(data).encode("utf-8"),
+            headers=headers,
+            method="POST"
+        )
+        
+        try:
+            with urllib.request.urlopen(req, timeout=10) as response:
+                print(f"Successfully sent OTP email to {to_email} via Brevo API.")
+                return True
+        except urllib.error.HTTPError as e:
+            error_info = e.read().decode("utf-8")
+            print(f"Brevo API returned HTTP error: {e.code} - {error_info}")
+            raise RuntimeError(f"Brevo API error: {error_info}")
+        except Exception as e:
+            print(f"Brevo API connection failed: {str(e)}")
+            raise RuntimeError(f"Brevo connection failed: {str(e)}")
+
+    # 2. Try Resend HTTP API (fallback)
     if settings.RESEND_API_KEY:
         print("RESEND_API_KEY configured. Sending via Resend API...")
         url = "https://api.resend.com/emails"
@@ -91,7 +130,7 @@ def send_otp_email(to_email: str, otp: str) -> bool:
             print(f"Resend API connection failed: {str(e)}")
             raise RuntimeError(f"Resend connection failed: {str(e)}")
 
-    # 2. Try standard SMTP
+    # 3. Try standard SMTP
     if settings.SMTP_HOST:
         print("SMTP_HOST configured. Sending via SMTP...")
         try:
@@ -113,7 +152,7 @@ def send_otp_email(to_email: str, otp: str) -> bool:
             print(f"SMTP delivery failed: {str(e)}")
             raise RuntimeError(f"SMTP failed: {str(e)}")
 
-    # 3. If neither is configured
-    print("No email service configured (SMTP or Resend). Skipping email transmission.")
+    # 4. If neither is configured
+    print("No email service configured (Brevo, Resend, or SMTP). Skipping email transmission.")
     return True
 

@@ -61,13 +61,21 @@ export const AuthProvider = ({ children }) => {
     return await authService.sendOtp(email);
   };
 
+  const sendForgotPasswordOtp = async (email) => {
+    return await authService.sendForgotPasswordOtp(email);
+  };
+
+  const resetPassword = async (email, otp, newPassword) => {
+    return await authService.resetPassword(email, otp, newPassword);
+  };
+
   const logout = () => {
     authService.logout();
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, sendOtp }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, sendOtp, sendForgotPasswordOtp, resetPassword }}>
       {children}
     </AuthContext.Provider>
   );

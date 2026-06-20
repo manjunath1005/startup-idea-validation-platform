@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     RESEND_API_KEY: str = os.getenv("RESEND_API_KEY", "")
     RESEND_FROM: str = os.getenv("RESEND_FROM", "onboarding@resend.dev")
 
+    BREVO_API_KEY: str = os.getenv("BREVO_API_KEY", "")
+    BREVO_SENDER_EMAIL: str = os.getenv("BREVO_SENDER_EMAIL", "")
+    BREVO_SENDER_NAME: str = os.getenv("BREVO_SENDER_NAME", "Startup Validation Platform")
+
 
     class Config:
         env_file = ".env"
