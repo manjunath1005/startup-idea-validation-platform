@@ -165,6 +165,36 @@ const Dashboard = () => {
                   <p className="text-xs text-slate-500 line-clamp-3 leading-relaxed mb-4 font-medium">
                     {idea.problem_statement}
                   </p>
+
+                  {/* Version Stats Grid */}
+                  <div className="bg-slate-50 border border-slate-100 rounded-lg p-3 grid grid-cols-2 gap-y-2.5 gap-x-4 text-[11px] text-slate-500 font-medium mb-4">
+                    <div>
+                      <span className="text-slate-400 block text-[9px] uppercase tracking-wider font-bold">Latest Version</span>
+                      <span className="text-slate-800 font-extrabold text-xs">V{idea.version}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[9px] uppercase tracking-wider font-bold">Total Versions</span>
+                      <span className="text-slate-800 font-extrabold text-xs">{report.versions ? report.versions.length : 1}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[9px] uppercase tracking-wider font-bold">Last Updated</span>
+                      <span className="text-slate-800 font-extrabold text-xs">
+                        {new Date(idea.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[9px] uppercase tracking-wider font-bold">Latest Viability</span>
+                      <span className={`font-extrabold text-xs ${
+                        scores 
+                          ? scores.viability_score >= 80 ? 'text-emerald-600'
+                            : scores.viability_score >= 60 ? 'text-amber-600'
+                            : 'text-rose-600'
+                          : 'text-slate-400 font-semibold'
+                      }`}>
+                        {scores ? `${scores.viability_score}%` : 'Not Evaluated'}
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-3 mt-auto">

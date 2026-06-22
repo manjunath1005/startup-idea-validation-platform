@@ -51,6 +51,8 @@ class StartupIdeaCreate(BaseModel):
     target_audience: str
     business_type: str
     country_region: str
+    parent_id: Optional[UUID] = None
+    iteration_note: Optional[str] = None
 
 class StartupIdeaResponse(BaseModel):
     id: UUID
@@ -63,9 +65,31 @@ class StartupIdeaResponse(BaseModel):
     business_type: str
     country_region: str
     created_at: datetime
+    parent_id: Optional[UUID] = None
+    version: int = 1
+    iteration_note: Optional[str] = None
 
     class Config:
         from_attributes = True
+
+class StartupVersionSummary(BaseModel):
+    id: UUID
+    version: int
+    created_at: datetime
+    viability_score: Optional[int] = None
+    market_opportunity_score: Optional[int] = None
+    competition_score: Optional[int] = None
+    revenue_potential_score: Optional[int] = None
+    risk_assessment_score: Optional[int] = None
+    name: str
+    industry: str
+    business_type: str
+    country_region: str
+    problem_statement: Optional[str] = None
+    solution_description: Optional[str] = None
+    target_audience: Optional[str] = None
+    iteration_note: Optional[str] = None
+    key_changes: Optional[List[str]] = None
 
 
 # Score & SWOT schemas
@@ -79,6 +103,7 @@ class StartupScoreResponse(BaseModel):
     risk_assessment_score: int
     explanation: str
     improvement_suggestions: List[str]
+    key_changes: Optional[List[str]] = None
     created_at: datetime
 
     class Config:
@@ -178,3 +203,4 @@ class FullReportResponse(BaseModel):
     revenue: Optional[RevenueReportResponse] = None
     canvas: Optional[BusinessCanvasResponse] = None
     pitch_deck: Optional[PitchDeckResponse] = None
+    versions: List[StartupVersionSummary] = []

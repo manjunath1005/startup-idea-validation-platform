@@ -31,9 +31,14 @@ class StartupIdea(Base):
     business_type = Column(String, nullable=False)  # B2B, B2C, B2B2C, SaaS, etc.
     country_region = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    parent_id = Column(UUID(as_uuid=True), ForeignKey("startup_ideas.id", ondelete="CASCADE"), nullable=True)
+    version = Column(Integer, default=1, nullable=False)
+    iteration_note = Column(Text, nullable=True)
 
     # Relationships
     user = relationship("User", back_populates="ideas")
+    parent = relationship("StartupIdea", remote_side=[id], back_populates="versions")
+    versions = relationship("StartupIdea", back_populates="parent", cascade="all, delete-orphan", primaryjoin="StartupIdea.id==StartupIdea.parent_id", order_by="StartupIdea.version.asc()")
     scores = relationship("StartupScore", back_populates="startup_idea", uselist=False, cascade="all, delete-orphan")
     swot = relationship("SWOTReport", back_populates="startup_idea", uselist=False, cascade="all, delete-orphan")
     competitors = relationship("CompetitorReport", back_populates="startup_idea", uselist=False, cascade="all, delete-orphan")
@@ -54,6 +59,7 @@ class StartupScore(Base):
     risk_assessment_score = Column(Integer, nullable=False)
     explanation = Column(Text, nullable=False)
     improvement_suggestions = Column(JSON, nullable=False)  # List of improvement suggestions
+    key_changes = Column(JSON, nullable=True)  # List of key changes from previous version
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     startup_idea = relationship("StartupIdea", back_populates="scores")

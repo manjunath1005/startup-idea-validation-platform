@@ -16,6 +16,32 @@ def submit_idea(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
+    version = 1
+    parent_id = idea_in.parent_id
+    
+    if parent_id:
+        # Verify parent exists and belongs to current user
+        parent_idea = db.query(StartupIdea).filter(
+            StartupIdea.id == parent_id,
+            StartupIdea.user_id == current_user.id
+        ).first()
+        if not parent_idea:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Parent startup idea not found."
+            )
+            
+        # Resolve true root parent (flattening hierarchy to max 2 levels)
+        root_parent_id = parent_idea.parent_id if parent_idea.parent_id else parent_idea.id
+        parent_id = root_parent_id
+        
+        from sqlalchemy import func, or_
+        max_version = db.query(func.max(StartupIdea.version)).filter(
+            or_(StartupIdea.id == root_parent_id, StartupIdea.parent_id == root_parent_id)
+        ).scalar()
+        
+        version = (max_version or 1) + 1
+
     db_idea = StartupIdea(
         user_id=current_user.id,
         name=idea_in.name,
@@ -24,7 +50,10 @@ def submit_idea(
         solution_description=idea_in.solution_description,
         target_audience=idea_in.target_audience,
         business_type=idea_in.business_type,
-        country_region=idea_in.country_region
+        country_region=idea_in.country_region,
+        parent_id=parent_id,
+        version=version,
+        iteration_note=idea_in.iteration_note
     )
     db.add(db_idea)
     db.commit()

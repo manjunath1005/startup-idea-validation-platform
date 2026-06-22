@@ -15,7 +15,7 @@ from reportlab.pdfgen import canvas
 
 from app.database import get_db
 from app.models import StartupIdea, User
-from app.schemas import FullReportResponse
+from app.schemas import FullReportResponse, StartupVersionSummary
 from app.auth import get_current_user
 
 router = APIRouter(prefix="/reports", tags=["Reports"])
@@ -65,26 +65,67 @@ def get_all_reports(
     """
     Get all ideas along with their generated reports for the active user.
     """
-    ideas = db.query(StartupIdea).filter(StartupIdea.user_id == current_user.id)\
-        .options(
-            joinedload(StartupIdea.scores),
-            joinedload(StartupIdea.swot),
-            joinedload(StartupIdea.competitors),
-            joinedload(StartupIdea.revenue),
-            joinedload(StartupIdea.canvas),
-            joinedload(StartupIdea.pitch_deck)
-        ).order_by(StartupIdea.created_at.desc()).all()
+    # Fetch only root ideas (where parent_id is NULL)
+    ideas = db.query(StartupIdea).filter(
+        StartupIdea.user_id == current_user.id,
+        StartupIdea.parent_id == None
+    ).options(
+        joinedload(StartupIdea.scores),
+        joinedload(StartupIdea.swot),
+        joinedload(StartupIdea.competitors),
+        joinedload(StartupIdea.revenue),
+        joinedload(StartupIdea.canvas),
+        joinedload(StartupIdea.pitch_deck),
+        joinedload(StartupIdea.versions).joinedload(StartupIdea.scores)
+    ).order_by(StartupIdea.created_at.desc()).all()
     
     reports = []
     for idea in ideas:
+        all_versions = [idea] + list(idea.versions)
+        all_versions.sort(key=lambda x: x.version)
+        
+        # Build version summaries
+        version_summaries = []
+        for v in all_versions:
+            v_score = v.scores.viability_score if v.scores else None
+            m_score = v.scores.market_opportunity_score if v.scores else None
+            c_score = v.scores.competition_score if v.scores else None
+            rev_score = v.scores.revenue_potential_score if v.scores else None
+            risk_score = v.scores.risk_assessment_score if v.scores else None
+            k_changes = v.scores.key_changes if v.scores else None
+
+            version_summaries.append(StartupVersionSummary(
+                id=v.id,
+                version=v.version,
+                created_at=v.created_at,
+                viability_score=v_score,
+                market_opportunity_score=m_score,
+                competition_score=c_score,
+                revenue_potential_score=rev_score,
+                risk_assessment_score=risk_score,
+                name=v.name,
+                industry=v.industry,
+                business_type=v.business_type,
+                country_region=v.country_region,
+                problem_statement=v.problem_statement,
+                solution_description=v.solution_description,
+                target_audience=v.target_audience,
+                iteration_note=v.iteration_note,
+                key_changes=k_changes
+            ))
+            
+        # Display the latest version's concept and scores as primary card details
+        latest_version = all_versions[-1]
+        
         reports.append(FullReportResponse(
-            idea=idea,
-            scores=idea.scores,
-            swot=idea.swot,
-            competitors=idea.competitors,
-            revenue=idea.revenue,
-            canvas=idea.canvas,
-            pitch_deck=idea.pitch_deck
+            idea=latest_version,
+            scores=latest_version.scores,
+            swot=latest_version.swot,
+            competitors=latest_version.competitors,
+            revenue=latest_version.revenue,
+            canvas=latest_version.canvas,
+            pitch_deck=latest_version.pitch_deck,
+            versions=version_summaries
         ))
     return reports
 
@@ -98,22 +139,74 @@ def get_report_by_id(
     """
     Get a single consolidated report by idea ID.
     """
-    idea = db.query(StartupIdea).filter(StartupIdea.id == idea_id, StartupIdea.user_id == current_user.id)\
-        .options(
-            joinedload(StartupIdea.scores),
-            joinedload(StartupIdea.swot),
-            joinedload(StartupIdea.competitors),
-            joinedload(StartupIdea.revenue),
-            joinedload(StartupIdea.canvas),
-            joinedload(StartupIdea.pitch_deck)
-        ).first()
+    # Fetch the specific idea (could be root or version child)
+    idea = db.query(StartupIdea).filter(
+        StartupIdea.id == idea_id,
+        StartupIdea.user_id == current_user.id
+    ).options(
+        joinedload(StartupIdea.parent),
+        joinedload(StartupIdea.scores),
+        joinedload(StartupIdea.swot),
+        joinedload(StartupIdea.competitors),
+        joinedload(StartupIdea.revenue),
+        joinedload(StartupIdea.canvas),
+        joinedload(StartupIdea.pitch_deck)
+    ).first()
     
     if not idea:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Startup idea report not found."
         )
+        
+    # Resolve the root idea (the parent if it has one, otherwise itself)
+    root_idea = idea
+    if idea.parent_id:
+        root_idea = db.query(StartupIdea).filter(
+            StartupIdea.id == idea.parent_id,
+            StartupIdea.user_id == current_user.id
+        ).options(
+            joinedload(StartupIdea.scores),
+            joinedload(StartupIdea.versions).joinedload(StartupIdea.scores)
+        ).first()
+        
+    # Compile all versions of the root concept
+    if root_idea:
+        all_versions = [root_idea] + list(root_idea.versions)
+    else:
+        all_versions = [idea]
+        
+    all_versions.sort(key=lambda x: x.version)
     
+    version_summaries = []
+    for v in all_versions:
+        v_score = v.scores.viability_score if v.scores else None
+        m_score = v.scores.market_opportunity_score if v.scores else None
+        c_score = v.scores.competition_score if v.scores else None
+        rev_score = v.scores.revenue_potential_score if v.scores else None
+        risk_score = v.scores.risk_assessment_score if v.scores else None
+        k_changes = v.scores.key_changes if v.scores else None
+
+        version_summaries.append(StartupVersionSummary(
+            id=v.id,
+            version=v.version,
+            created_at=v.created_at,
+            viability_score=v_score,
+            market_opportunity_score=m_score,
+            competition_score=c_score,
+            revenue_potential_score=rev_score,
+            risk_assessment_score=risk_score,
+            name=v.name,
+            industry=v.industry,
+            business_type=v.business_type,
+            country_region=v.country_region,
+            problem_statement=v.problem_statement,
+            solution_description=v.solution_description,
+            target_audience=v.target_audience,
+            iteration_note=v.iteration_note,
+            key_changes=k_changes
+        ))
+        
     return FullReportResponse(
         idea=idea,
         scores=idea.scores,
@@ -121,7 +214,8 @@ def get_report_by_id(
         competitors=idea.competitors,
         revenue=idea.revenue,
         canvas=idea.canvas,
-        pitch_deck=idea.pitch_deck
+        pitch_deck=idea.pitch_deck,
+        versions=version_summaries
     )
 
 

@@ -2,6 +2,7 @@ import os
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 
+from sqlalchemy import text
 from app.config import settings
 from app.database import engine, Base
 from app.routes import auth, startup, analysis, reports
@@ -11,6 +12,29 @@ from app.routes import auth, startup, analysis, reports
 try:
     Base.metadata.create_all(bind=engine)
     print("Database tables initialized successfully.")
+    
+    # Dynamic SQLite/PostgreSQL schema alterations to support startup concept versioning
+    with engine.begin() as conn:
+        try:
+            conn.execute(text("ALTER TABLE startup_ideas ADD COLUMN parent_id UUID REFERENCES startup_ideas(id) ON DELETE CASCADE"))
+            print("Database migrated: Added parent_id column to startup_ideas table.")
+        except Exception:
+            pass  # Column already exists
+        try:
+            conn.execute(text("ALTER TABLE startup_ideas ADD COLUMN version INTEGER DEFAULT 1"))
+            print("Database migrated: Added version column to startup_ideas table.")
+        except Exception:
+            pass  # Column already exists
+        try:
+            conn.execute(text("ALTER TABLE startup_ideas ADD COLUMN iteration_note TEXT"))
+            print("Database migrated: Added iteration_note column to startup_ideas table.")
+        except Exception:
+            pass  # Column already exists
+        try:
+            conn.execute(text("ALTER TABLE startup_scores ADD COLUMN key_changes TEXT"))
+            print("Database migrated: Added key_changes column to startup_scores table.")
+        except Exception:
+            pass  # Column already exists
 except Exception as e:
     print(f"Warning: Database connection or initialization failed: {str(e)}")
 

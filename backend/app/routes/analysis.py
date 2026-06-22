@@ -41,8 +41,17 @@ def run_evaluation(
 ):
     idea = verify_idea_ownership(payload.startup_idea_id, current_user.id, db)
     
+    # Fetch previous version if iteration version > 1
+    prev_idea = None
+    if idea.version > 1:
+        prev_idea = db.query(StartupIdea).filter(
+            StartupIdea.user_id == current_user.id,
+            (StartupIdea.parent_id == (idea.parent_id or idea.id)) | (StartupIdea.id == (idea.parent_id or idea.id)),
+            StartupIdea.version == idea.version - 1
+        ).first()
+
     # Run Gemini AI evaluation
-    result = gemini.evaluate_startup_idea(idea)
+    result = gemini.evaluate_startup_idea(idea, prev_idea=prev_idea)
     
     # Store or Update in database
     db_score = db.query(StartupScore).filter(StartupScore.startup_idea_id == idea.id).first()
@@ -54,6 +63,7 @@ def run_evaluation(
         db_score.risk_assessment_score = result["risk_assessment_score"]
         db_score.explanation = result["explanation"]
         db_score.improvement_suggestions = result["improvement_suggestions"]
+        db_score.key_changes = result.get("key_changes", [])
     else:
         db_score = StartupScore(
             startup_idea_id=idea.id,
@@ -63,7 +73,8 @@ def run_evaluation(
             revenue_potential_score=result["revenue_potential_score"],
             risk_assessment_score=result["risk_assessment_score"],
             explanation=result["explanation"],
-            improvement_suggestions=result["improvement_suggestions"]
+            improvement_suggestions=result["improvement_suggestions"],
+            key_changes=result.get("key_changes", [])
         )
         db.add(db_score)
         
@@ -241,7 +252,16 @@ def run_all_analyses(
     idea = verify_idea_ownership(payload.startup_idea_id, current_user.id, db)
     
     # 1. Evaluate
-    res_eval = gemini.evaluate_startup_idea(idea)
+    # Fetch previous version if iteration version > 1
+    prev_idea = None
+    if idea.version > 1:
+        prev_idea = db.query(StartupIdea).filter(
+            StartupIdea.user_id == current_user.id,
+            (StartupIdea.parent_id == (idea.parent_id or idea.id)) | (StartupIdea.id == (idea.parent_id or idea.id)),
+            StartupIdea.version == idea.version - 1
+        ).first()
+
+    res_eval = gemini.evaluate_startup_idea(idea, prev_idea=prev_idea)
     db_score = db.query(StartupScore).filter(StartupScore.startup_idea_id == idea.id).first()
     if db_score:
         db_score.viability_score = res_eval["viability_score"]
@@ -251,6 +271,7 @@ def run_all_analyses(
         db_score.risk_assessment_score = res_eval["risk_assessment_score"]
         db_score.explanation = res_eval["explanation"]
         db_score.improvement_suggestions = res_eval["improvement_suggestions"]
+        db_score.key_changes = res_eval.get("key_changes", [])
     else:
         db.add(StartupScore(
             startup_idea_id=idea.id,
@@ -260,7 +281,8 @@ def run_all_analyses(
             revenue_potential_score=res_eval["revenue_potential_score"],
             risk_assessment_score=res_eval["risk_assessment_score"],
             explanation=res_eval["explanation"],
-            improvement_suggestions=res_eval["improvement_suggestions"]
+            improvement_suggestions=res_eval["improvement_suggestions"],
+            key_changes=res_eval.get("key_changes", [])
         ))
 
     # 2. SWOT

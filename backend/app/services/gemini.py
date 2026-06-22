@@ -62,18 +62,39 @@ Solution Description: {idea.solution_description}
 """
 
 
-def evaluate_startup_idea(idea: Any) -> Dict[str, Any]:
+def evaluate_startup_idea(idea: Any, prev_idea: Any = None) -> Dict[str, Any]:
     """
     Evaluates startup viability, market opportunity, competition level,
     revenue potential, and risk assessment (scores from 0-100).
+    Also identifies key changes when comparing against previous versions.
     """
     startup_info = _format_startup_info(idea)
     system_instruction = "You are an expert venture capitalist and startup evaluator. Return a structured JSON response."
     
+    comparison_info = ""
+    if prev_idea:
+        comparison_info = f"""
+---
+PREVIOUS VERSION (Version {prev_idea.version}) DETAILS:
+Startup Name: {prev_idea.name}
+Industry: {prev_idea.industry}
+Business Type: {prev_idea.business_type}
+Target Audience: {prev_idea.target_audience}
+Target Region/Country: {prev_idea.country_region}
+Problem Statement: {prev_idea.problem_statement}
+Solution Description: {prev_idea.solution_description}
+"""
+
+    note_info = ""
+    if getattr(idea, "iteration_note", None):
+        note_info = f"\nFOUNDER'S ITERATION NOTE / REASON FOR CHANGE:\n{idea.iteration_note}\n"
+
     prompt = f"""
 Analyze the following startup idea and evaluate its potential.
 
 {startup_info}
+{comparison_info}
+{note_info}
 
 You must return a JSON object with the following exact keys and types:
 {{
@@ -83,23 +104,32 @@ You must return a JSON object with the following exact keys and types:
     "revenue_potential_score": int (0 to 100),
     "risk_assessment_score": int (0 to 100 - where 100 means low risk),
     "explanation": string (detailed evaluation analysis summary),
-    "improvement_suggestions": list of strings (actionable suggestions to improve the scores)
+    "improvement_suggestions": list of strings (actionable suggestions to improve the scores),
+    "key_changes": list of strings (actionable summary of key changes, what improved, and what became worse compared to the previous version. If there is no previous version, return an empty list [])
 }}
 """
     if not settings.GEMINI_API_KEY:
         # Return mock data
+        mock_key_changes = []
+        if prev_idea:
+            mock_key_changes = [
+                f"Narrowed target audience from '{prev_idea.target_audience}' to '{idea.target_audience}'" if prev_idea.target_audience != idea.target_audience else "Refined target audience positioning",
+                f"Changed model from '{prev_idea.business_type}' to '{idea.business_type}'" if prev_idea.business_type != idea.business_type else "Maintained business model consistency",
+                "Strengthened AI recommendation and pricing intelligence positioning based on founder's iteration note" if getattr(idea, "iteration_note", None) else "Improved core product positioning and value proposition"
+            ]
         return {
-            "viability_score": 78,
-            "market_opportunity_score": 85,
-            "competition_score": 60,
-            "revenue_potential_score": 80,
-            "risk_assessment_score": 70,
-            "explanation": f"The idea '{idea.name}' addresses a real problem in the {idea.industry} sector. The target audience of '{idea.target_audience}' shows clear demand, but execution and direct competition are key hurdles. Modernizing operations here offers strong scalability.",
+            "viability_score": 75 if prev_idea else 72,
+            "market_opportunity_score": 78 if prev_idea else 75,
+            "competition_score": 65 if prev_idea else 55,
+            "revenue_potential_score": 74 if prev_idea else 70,
+            "risk_assessment_score": 70 if prev_idea else 65,
+            "explanation": f"The updated iteration of '{idea.name}' addresses a real problem in the {idea.industry} sector. The target audience of '{idea.target_audience}' shows clear demand, but execution and direct competition are key hurdles. Modernizing operations here offers strong scalability.",
             "improvement_suggestions": [
                 "Establish early partnerships with core industry stakeholders.",
                 "Build a lightweight MVP focusing on the single most painful problem point.",
                 "Refine the differentiation strategy against existing key competitors."
-            ]
+            ],
+            "key_changes": mock_key_changes
         }
 
     try:
@@ -107,14 +137,22 @@ You must return a JSON object with the following exact keys and types:
     except Exception:
         # Fallback if API fails
         logger.warning("Gemini API call failed, using mock fallback.")
+        mock_key_changes = []
+        if prev_idea:
+            mock_key_changes = [
+                "Adjusted target customer alignment",
+                "Refined pricing model parameters",
+                "Increased AI-driven efficiency focus"
+            ]
         return {
-            "viability_score": 72,
+            "viability_score": 75 if prev_idea else 72,
             "market_opportunity_score": 75,
             "competition_score": 55,
             "revenue_potential_score": 70,
             "risk_assessment_score": 65,
             "explanation": "Temporary API error, using standard fallback analysis. The business model shows positive initial market fit with moderate barrier to entry.",
-            "improvement_suggestions": ["Perform secondary focus group tests", "Analyze pricing sensitivity"]
+            "improvement_suggestions": ["Perform secondary focus group tests", "Analyze pricing sensitivity"],
+            "key_changes": mock_key_changes
         }
 
 

@@ -7,7 +7,8 @@ import {
 } from 'recharts';
 import {
   ArrowLeft, Download, RefreshCw, BarChart2, Shield, Eye, DollarSign,
-  Briefcase, HeartHandshake, Loader2, Check, X, ChevronLeft, ChevronRight, Award
+  Briefcase, HeartHandshake, Loader2, Check, X, ChevronLeft, ChevronRight, Award,
+  GitCompare, History, TrendingUp, TrendingDown
 } from 'lucide-react';
 
 const formatUrl = (url) => {
@@ -30,6 +31,10 @@ const IdeaDetail = () => {
   // Pitch deck carousel state
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
+  // Compare tab state
+  const [compareVerAId, setCompareVerAId] = useState('');
+  const [compareVerBId, setCompareVerBId] = useState('');
+
   const fetchReport = async () => {
     try {
       const response = await reportsService.getReport(id);
@@ -46,6 +51,21 @@ const IdeaDetail = () => {
   useEffect(() => {
     fetchReport();
   }, [id]);
+
+  useEffect(() => {
+    if (report?.versions && report.versions.length > 1) {
+      const sorted = [...report.versions].sort((a, b) => a.version - b.version);
+      const currentIndex = sorted.findIndex(v => v.id === id);
+      
+      if (currentIndex > 0) {
+        setCompareVerAId(sorted[currentIndex - 1].id);
+        setCompareVerBId(sorted[currentIndex].id);
+      } else {
+        setCompareVerAId(sorted[0].id);
+        setCompareVerBId(sorted[sorted.length - 1].id);
+      }
+    }
+  }, [report, id]);
 
   const handleRecalculate = async () => {
     setRecalculating(true);
@@ -160,6 +180,7 @@ const IdeaDetail = () => {
     { id: 'canvas', name: 'Business Canvas', icon: Briefcase },
     { id: 'pitchdeck', name: 'Pitch Deck', icon: Award },
     { id: 'mentor', name: 'Mentor Advice', icon: HeartHandshake },
+    { id: 'compare', name: 'Compare Versions', icon: GitCompare },
   ];
 
   return (
@@ -174,7 +195,26 @@ const IdeaDetail = () => {
             <ArrowLeft size={14} />
             Back to Dashboard
           </button>
-          <h2 className="text-2xl font-bold text-slate-900 tracking-wide">{idea.name}</h2>
+          <div className="flex items-center flex-wrap gap-2.5">
+            <h2 className="text-2xl font-bold text-slate-900 tracking-wide">{idea.name}</h2>
+            {report.versions && report.versions.length > 1 ? (
+              <select
+                value={idea.id}
+                onChange={(e) => navigate(`/report/${e.target.value}`)}
+                className="px-2.5 py-1 border border-slate-200 rounded-lg text-[11px] font-bold bg-slate-50 text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer shadow-sm"
+              >
+                {report.versions.map((v) => (
+                  <option key={v.id} value={v.id}>
+                    Version {v.version} ({new Date(v.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}) {v.viability_score ? `• ${v.viability_score}%` : ''}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <span className="bg-slate-100 text-slate-550 border border-slate-200 px-2 py-0.5 rounded-md text-[10px] font-bold">
+                Version 1
+              </span>
+            )}
+          </div>
           <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 mt-1">
             <span className="bg-blue-50 text-blue-600 border border-blue-100 px-2.5 py-0.5 rounded-full font-bold">
               {idea.industry}
@@ -187,6 +227,14 @@ const IdeaDetail = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => navigate(`/submit?parent_id=${idea.parent_id || idea.id}`)}
+            className="bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold py-2.5 px-4 rounded-xl text-sm flex items-center gap-2 transition-all cursor-pointer shadow-sm animate-pulse-glow"
+          >
+            <GitCompare size={16} className="text-slate-500" />
+            Iterate Concept
+          </button>
+
           <button
             onClick={handleRecalculate}
             disabled={recalculating}
@@ -859,6 +907,426 @@ const IdeaDetail = () => {
             )}
           </div>
         )}
+
+        {/* Tab 8: Compare Versions */}
+        {activeTab === 'compare' && (() => {
+          const sortedVersions = [...(report.versions || [])].sort((a, b) => a.version - b.version);
+          const verA = report.versions?.find((v) => v.id === compareVerAId) || sortedVersions[0];
+          const verB = report.versions?.find((v) => v.id === compareVerBId) || sortedVersions[sortedVersions.length - 1];
+
+          if (!verA || !verB) {
+            return (
+              <div className="glass-panel p-12 text-center text-slate-400 text-sm border border-slate-200 bg-white">
+                No versions available for comparison.
+              </div>
+            );
+          }
+
+          // Calculate overall score delta
+          const scoreDelta = (typeof verA.viability_score === 'number' && typeof verB.viability_score === 'number')
+            ? verB.viability_score - verA.viability_score
+            : null;
+
+          // Calculate section level improvements and differences
+          const metrics = [
+            { name: 'Viability Score', key: 'viability_score' },
+            { name: 'Market Opportunity', key: 'market_opportunity_score' },
+            { name: 'Competition Safety', key: 'competition_score' },
+            { name: 'Revenue Potential', key: 'revenue_potential_score' },
+            { name: 'Risk Safety', key: 'risk_assessment_score' },
+          ];
+
+          const diffs = metrics.map((m) => {
+            const valA = verA[m.key];
+            const valB = verB[m.key];
+            const diff = (typeof valA === 'number' && typeof valB === 'number') ? valB - valA : null;
+            return { name: m.name, valA, valB, diff };
+          });
+
+          // Find biggest improvement
+          const positiveDiffs = diffs.filter(d => d.diff !== null && d.diff > 0);
+          positiveDiffs.sort((a, b) => b.diff - a.diff);
+          const biggestImprovement = positiveDiffs.length > 0
+            ? `${positiveDiffs[0].name} (+${positiveDiffs[0].diff})`
+            : 'None';
+
+          // Get primary strategic change
+          const mainStrategicChange = verB?.iteration_note || (verB?.key_changes && verB.key_changes[0]) || 'No iteration notes provided.';
+
+          // Recommendation
+          let recommendation = 'Continue developing the concept and run further user interviews.';
+          if (scoreDelta !== null) {
+            if (scoreDelta > 0) {
+              recommendation = `Continue with Version ${verB?.version} and double-down on the strategic changes. Focus testing on investor-focused positioning.`;
+            } else if (scoreDelta < 0) {
+              recommendation = `Revert to Version ${verA?.version} or address regression. Review the drop in ${diffs.find(d => d.diff < 0)?.name || 'metrics'} and iterate again.`;
+            } else {
+              recommendation = `Both versions show equal viability. Test Version ${verB?.version} with a small target user cohort to gather feedback.`;
+            }
+          }
+
+          return (
+            <div className="space-y-6">
+              {/* Dropdowns to select compared versions */}
+              {report.versions && report.versions.length > 1 ? (
+                <div className="glass-panel p-5 rounded-2xl border border-slate-200 bg-white flex flex-wrap items-center justify-between gap-4">
+                  <div className="flex items-center gap-2">
+                    <GitCompare className="text-blue-600 shrink-0" size={20} />
+                    <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Compare Two Iterations</h3>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-slate-500 font-bold">Compare</span>
+                      <select
+                        value={compareVerAId}
+                        onChange={(e) => setCompareVerAId(e.target.value)}
+                        className="px-2.5 py-1.5 border border-slate-250 rounded-lg text-xs font-semibold bg-slate-50 text-slate-700 focus:outline-none cursor-pointer"
+                      >
+                        {report.versions.map((v) => (
+                          <option key={v.id} value={v.id} disabled={v.id === compareVerBId}>
+                            Version {v.version} ({new Date(v.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}) {v.viability_score ? `• ${v.viability_score}%` : ''}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <span className="text-xs text-slate-400 font-bold">VS</span>
+                    <div className="flex items-center gap-2">
+                      <select
+                        value={compareVerBId}
+                        onChange={(e) => setCompareVerBId(e.target.value)}
+                        className="px-2.5 py-1.5 border border-slate-250 rounded-lg text-xs font-semibold bg-slate-50 text-slate-700 focus:outline-none cursor-pointer"
+                      >
+                        {report.versions.map((v) => (
+                          <option key={v.id} value={v.id} disabled={v.id === compareVerAId}>
+                            Version {v.version} ({new Date(v.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}) {v.viability_score ? `• ${v.viability_score}%` : ''}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Version Comparison Summary Card */}
+              {verA && verB && report.versions?.length > 1 && (
+                <div className="glass-panel p-6 rounded-2xl border border-blue-100 bg-blue-50/20 shadow-sm space-y-4">
+                  <h4 className="text-sm font-extrabold text-blue-900 uppercase tracking-wider flex items-center gap-2">
+                    <Award size={18} className="text-blue-600" />
+                    Version Comparison Summary
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <div className="bg-white border border-slate-100 p-4 rounded-xl shadow-xs">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Current Version</span>
+                      <span className="text-sm font-extrabold text-slate-800">Version {verB.version}</span>
+                    </div>
+                    <div className="bg-white border border-slate-100 p-4 rounded-xl shadow-xs">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Previous Version</span>
+                      <span className="text-sm font-extrabold text-slate-800">Version {verA.version}</span>
+                    </div>
+                    <div className="bg-white border border-slate-100 p-4 rounded-xl shadow-xs">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Net Viability Change</span>
+                      <span className={`text-sm font-extrabold flex items-center gap-1 ${
+                        scoreDelta > 0 ? 'text-emerald-600' : scoreDelta < 0 ? 'text-rose-600' : 'text-slate-600'
+                      }`}>
+                        {scoreDelta > 0 ? `+${scoreDelta}` : scoreDelta < 0 ? scoreDelta : '0'}
+                        {scoreDelta > 0 ? <TrendingUp size={14} /> : scoreDelta < 0 ? <TrendingDown size={14} /> : null}
+                      </span>
+                    </div>
+                    <div className="bg-white border border-slate-100 p-4 rounded-xl shadow-xs">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-1">Biggest Improvement</span>
+                      <span className="text-sm font-extrabold text-emerald-600 truncate block">
+                        {biggestImprovement}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="border-t border-blue-100/60 pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Main Strategic Change</span>
+                      <p className="text-xs text-slate-650 font-medium leading-relaxed italic">
+                        "{mainStrategicChange}"
+                      </p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Recommendation</span>
+                      <p className="text-xs text-slate-700 font-bold leading-relaxed">
+                        {recommendation}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Side-by-Side Comparison Panel */}
+              {verA && verB && report.versions?.length > 1 && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Left Column: Version A Details */}
+                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                    <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+                      <h4 className="font-extrabold text-slate-800 text-sm uppercase tracking-wider">
+                        Version {verA.version} Configuration
+                      </h4>
+                      <span className="text-[11px] text-slate-500 font-bold bg-slate-100 px-2 py-0.5 rounded-full">
+                        {new Date(verA.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </span>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mb-1">Business Model Type</span>
+                        <p className="text-xs text-slate-700 font-semibold">{verA.business_type}</p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mb-1">Target Audience</span>
+                        <p className="text-xs text-slate-700 font-semibold leading-relaxed">{verA.target_audience}</p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mb-1">Problem Statement</span>
+                        <p className="text-xs text-slate-700 leading-relaxed font-medium">{verA.problem_statement}</p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mb-1">Solution Description</span>
+                        <p className="text-xs text-slate-700 leading-relaxed font-medium">{verA.solution_description}</p>
+                      </div>
+                      {verA.iteration_note && (
+                        <div className="bg-slate-50 p-3 rounded-lg border border-slate-150">
+                          <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mb-1">Iteration Note</span>
+                          <p className="text-xs text-slate-600 italic leading-relaxed font-medium">"{verA.iteration_note}"</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Right Column: Version B Details */}
+                  <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+                    <div className="flex justify-between items-center pb-3 border-b border-slate-100">
+                      <h4 className="font-extrabold text-blue-900 text-sm uppercase tracking-wider flex items-center gap-1.5">
+                        Version {verB.version} Configuration
+                        {verB.id === idea.id && (
+                          <span className="bg-blue-600 text-white text-[8px] font-extrabold uppercase tracking-widest px-1.5 py-0.5 rounded-full">Viewing</span>
+                        )}
+                      </h4>
+                      <span className="text-[11px] text-blue-800 font-bold bg-blue-50 px-2 py-0.5 rounded-full">
+                        {new Date(verB.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </span>
+                    </div>
+
+                    <div className="space-y-4">
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mb-1">Business Model Type</span>
+                        <p className="text-xs text-slate-700 font-semibold flex items-center gap-1.5">
+                          {verB.business_type}
+                          {verA.business_type !== verB.business_type && (
+                            <span className="bg-emerald-50 text-emerald-700 text-[8px] font-extrabold uppercase tracking-widest px-1 py-0.5 rounded border border-emerald-100">Changed</span>
+                          )}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mb-1">Target Audience</span>
+                        <p className="text-xs text-slate-700 font-semibold leading-relaxed">
+                          {verB.target_audience}
+                          {verA.target_audience !== verB.target_audience && (
+                            <span className="bg-emerald-50 text-emerald-700 text-[8px] font-extrabold uppercase tracking-widest px-1 py-0.5 rounded border border-emerald-100 ml-2">Changed</span>
+                          )}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mb-1">Problem Statement</span>
+                        <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                          {verB.problem_statement}
+                          {verA.problem_statement !== verB.problem_statement && (
+                            <span className="bg-emerald-50 text-emerald-700 text-[8px] font-extrabold uppercase tracking-widest px-1 py-0.5 rounded border border-emerald-100 ml-2">Changed</span>
+                          )}
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-bold text-slate-450 uppercase tracking-wider block mb-1">Solution Description</span>
+                        <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                          {verB.solution_description}
+                          {verA.solution_description !== verB.solution_description && (
+                            <span className="bg-emerald-50 text-emerald-700 text-[8px] font-extrabold uppercase tracking-widest px-1 py-0.5 rounded border border-emerald-100 ml-2">Changed</span>
+                          )}
+                        </p>
+                      </div>
+                      {verB.iteration_note && (
+                        <div className="bg-blue-50/20 p-3 rounded-lg border border-blue-100/60">
+                          <span className="text-[10px] font-bold text-blue-900 uppercase tracking-wider block mb-1">Iteration Note</span>
+                          <p className="text-xs text-slate-600 italic leading-relaxed font-medium">"{verB.iteration_note}"</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Section-Level Comparison Table */}
+              {verA && verB && report.versions?.length > 1 && (
+                <div className="glass-panel p-6 rounded-2xl border border-slate-200 bg-white shadow-sm">
+                  <h4 className="text-sm font-extrabold text-slate-800 uppercase tracking-wider mb-4 pb-2 border-b border-slate-100">
+                    Section-Level Score Comparison
+                  </h4>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm border-collapse">
+                      <thead>
+                        <tr className="bg-slate-50 border-b border-slate-200 text-slate-700">
+                          <th className="p-3.5 font-bold">Metric / Section</th>
+                          <th className="p-3.5 font-bold text-center">Version {verA.version}</th>
+                          <th className="p-3.5 font-bold text-center">Version {verB.version}</th>
+                          <th className="p-3.5 font-bold text-center">Change</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 font-medium">
+                        {diffs.map((d, index) => {
+                          const hasChange = d.diff !== null;
+                          const isPos = d.diff > 0;
+                          const isNeg = d.diff < 0;
+
+                          return (
+                            <tr key={index} className="hover:bg-slate-50/40 text-slate-700">
+                              <td className="p-3.5 text-xs font-bold text-slate-850">{d.name}</td>
+                              <td className="p-3.5 text-center text-xs font-bold">
+                                {d.valA !== null ? `${d.valA}%` : <span className="text-slate-400 italic text-[11px]">Not Evaluated</span>}
+                              </td>
+                              <td className="p-3.5 text-center text-xs font-bold">
+                                {d.valB !== null ? `${d.valB}%` : <span className="text-slate-400 italic text-[11px]">Not Evaluated</span>}
+                              </td>
+                              <td className="p-3.5 text-center text-xs font-bold">
+                                {hasChange ? (
+                                  <span className={`flex items-center justify-center gap-1 ${
+                                    isPos ? 'text-emerald-600' : isNeg ? 'text-rose-600' : 'text-slate-500'
+                                  }`}>
+                                    {isPos ? `+${d.diff}` : d.diff === 0 ? '0' : d.diff}
+                                    {isPos ? <TrendingUp size={12} /> : isNeg ? <TrendingDown size={12} /> : null}
+                                  </span>
+                                ) : (
+                                  <span className="text-slate-400">-</span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* Concept Evolution History list */}
+              <div className="glass-panel p-6 rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div className="flex items-center gap-2 mb-4 pb-4 border-b border-slate-100">
+                  <History className="text-blue-600" size={22} />
+                  <div>
+                    <h3 className="text-base font-bold text-slate-800 uppercase tracking-wider">Concept Evolution History</h3>
+                    <p className="text-xs text-slate-500 mt-0.5 font-medium">Full archive of all versions submitted and evaluated for this concept.</p>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-sm border-collapse">
+                    <thead>
+                      <tr className="bg-slate-50 text-slate-700 border-b border-slate-200">
+                        <th className="p-4 font-semibold w-[120px]">Version</th>
+                        <th className="p-4 font-semibold w-[120px]">Date</th>
+                        <th className="p-4 font-semibold w-[140px] text-center">Viability Score</th>
+                        <th className="p-4 font-semibold w-[140px]">Business Type</th>
+                        <th className="p-4 font-semibold w-[140px]">Target Region</th>
+                        <th className="p-4 font-semibold min-w-[220px]">Key Changes</th>
+                        <th className="p-4 font-semibold">Iteration Reason</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-150">
+                      {report.versions && [...report.versions].sort((a, b) => b.version - a.version).map((v, idx, arr) => {
+                        const isActive = v.id === idea.id;
+                        const formattedDate = new Date(v.created_at).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric'
+                        });
+
+                        // Calculate score delta from previous version (which is at index idx + 1 because of descending sort)
+                        const prevVer = arr[idx + 1];
+                        const delta = (typeof v.viability_score === 'number' && typeof prevVer?.viability_score === 'number')
+                          ? v.viability_score - prevVer.viability_score
+                          : null;
+                        
+                        let scoreCell = null;
+                        if (v.viability_score !== null) {
+                          const val = v.viability_score;
+                          scoreCell = (
+                            <div className="flex flex-col items-center justify-center gap-1">
+                              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-extrabold text-xs border shadow-sm ${
+                                val >= 80 ? 'border-emerald-500 text-emerald-700 bg-emerald-50/50' :
+                                val >= 60 ? 'border-amber-500 text-amber-700 bg-amber-50/50' :
+                                'border-rose-500 text-rose-700 bg-rose-50/50'
+                              }`}>
+                                {val}%
+                              </div>
+                              {delta !== null && (
+                                <span className={`text-[10px] font-bold ${
+                                  delta > 0 ? 'text-emerald-600' : delta < 0 ? 'text-rose-600' : 'text-slate-500'
+                                }`}>
+                                  ({delta > 0 ? `+${delta}` : delta})
+                                </span>
+                              )}
+                            </div>
+                          );
+                        } else {
+                          scoreCell = <span className="text-slate-400 text-xs italic">N/A</span>;
+                        }
+
+                        return (
+                          <tr 
+                            key={v.id} 
+                            className={`transition-colors cursor-pointer group text-slate-700 ${
+                              isActive ? 'bg-blue-50/30 hover:bg-blue-50/50 border-l-4 border-l-blue-600 font-medium' : 'hover:bg-slate-50'
+                            }`}
+                            onClick={() => navigate(`/report/${v.id}`)}
+                          >
+                            <td className="p-4 font-bold text-slate-800">
+                              <span className="flex items-center gap-1.5">
+                                Version {v.version}
+                                {isActive && (
+                                  <span className="bg-blue-600 text-white text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full">
+                                    Viewing
+                                  </span>
+                                )}
+                              </span>
+                            </td>
+                            <td className="p-4 text-slate-500 font-medium whitespace-nowrap">
+                              {formattedDate}
+                            </td>
+                            <td className="p-4 text-center">
+                              {scoreCell}
+                            </td>
+                            <td className="p-4 text-xs font-semibold">
+                              {v.business_type}
+                            </td>
+                            <td className="p-4 text-xs font-semibold">
+                              {v.country_region}
+                            </td>
+                            <td className="p-4 text-xs text-slate-600 font-medium">
+                              {v.key_changes && v.key_changes.length > 0 ? (
+                                <ul className="list-disc pl-4 space-y-1">
+                                  {v.key_changes.map((change, i) => (
+                                    <li key={i}>{change}</li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <span className="text-slate-400 italic">Initial version evaluation</span>
+                              )}
+                            </td>
+                            <td className="p-4 text-xs text-slate-550 max-w-[220px] truncate" title={v.iteration_note || ''}>
+                              {v.iteration_note || <span className="text-slate-400 italic">N/A</span>}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
